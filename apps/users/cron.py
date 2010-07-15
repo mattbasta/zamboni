@@ -1,4 +1,5 @@
 from django.db import connections
+from django.db.models import Max
 
 import commonware.log
 import multidb
@@ -54,3 +55,18 @@ def _update_user_ratings(data, **kw):
     for pk, rating in data:
         rating = "%.2f" % round(rating, 2)
         UserProfile.objects.filter(pk=pk).update(averagerating=rating)
+
+
+@cronjobs.register
+def users_add_nicknames():
+    # This could be one big blob of sql but in here we can chunk it and avoid
+    # locking up the database.
+    cap = UserProfile.objects.aggregate(max=Max('id'))['max']
+    step = 300
+    cursor = connections['default'].cursor()
+    for num in xrange(step, cap + step * 2, step):
+        cursor.execute("""
+            UPDATE users
+              SET nickname=SUBSTR(
+                MD5(CONCAT(id, firstname, lastname, created, modified)), -8)
+            WHERE nickname IS NULL OR nickname='' AND id < %s""" % num)
