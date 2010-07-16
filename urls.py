@@ -82,6 +82,8 @@ urlpatterns = patterns('',
 
     ('^addons/contribute/(\d+)/?$',
      lambda r, id: redirect('addons.contribute', id, permanent=True)),
+
+    ('^validator/?$', include('validator.urls')),
 )
 
 if settings.DEBUG:

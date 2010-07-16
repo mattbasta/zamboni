@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mozilla Add-on Validator</title>
+	<link type="text/css" rel="stylesheet" href="http://frame.serverboy.net/latest/" />
+</head>
+<body class="sans-serif">
+<div id="container">
+	<h1>Add-on Validation</h1>
+	<p>Upload your add-on to the server and we'll run it through our automated validation tool as a means of determining whether the package is fit for submission to the add-ons gallery.</p>
+	{% if error == "upload" %}
+		<p class="formerror">No file was submitted.</p>
+	{% endif %}
+	{% if error == "addon" %}
+		<p class="formerror">The file you submitted is not an XPI or JAR file.</p>
+	{% endif %}
+	<form action="/upload/save/" method="post" enctype="multipart/form-data">{% csrf_token %}
+		<p class="upload">
+			<label for="addon">Upload your add-on for validation</label>
+			<input type="file" name="addon" />
+			<input type="hidden" name="key" value="{{ key }}" />
+			<input type="hidden" name="timestamp" value="{{ timestamp }}" />
+			<input type="hidden" name="token" value="{{ token }}" />
+			<small>XPI and JAR files only.</small>
+		</p>
+		<p class="buttons"><input type="submit" value="Upload and Validate" /></p>
+	</form>
+</div>
+</body>
+</html>

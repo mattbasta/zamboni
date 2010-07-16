@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mozilla Add-on Validator - Status</title>
+	<link type="text/css" rel="stylesheet" href="http://frame.serverboy.net/latest/" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript"></script> 
+	<style type="text/css">
+	.notice_box p em {
+		color:#999;
+	}
+	</style>
+	<script type="text/javascript">
+	<!--
+	
+	var validator = {
+		updateStatus : function() {
+			
+			if(validator.mutex) {
+				validator.failcount++;
+				if(validator.failcount > 3) {
+					validator.mutex = false;
+					validator.failcount = 0;
+				} else {
+					return;
+				}
+			}
+			
+			validator.mutex = true;
+			
+			$.getJSON(
+				'/upload/poll/?id={{id}}',
+				'',
+				function(data) {
+					if(!("status" in data)) {
+						alert("There was an error processing your add-on.");
+						window.location.href = "/upload/";
+						return;
+					}
+				
+					var status = document.getElementById("status");
+					switch(data.status) {
+						case "queued":
+							status.innerHTML = "Your add-on is queued for validation.";
+							break;
+						case "done":
+							window.location.href = "/upload/results/?id={{id}}";
+							break;
+					}
+					
+					validator.failcount = 0;
+					validator.mutex = false;
+					
+				}
+			);
+		},
+		interval: null,
+		mutex: false,
+		failcount: 0
+	};
+	$(document).ready(function() {
+		validator.interval = setInterval(validator.updateStatus, 3000);
+	});
+	-->
+	</script>
+</head>
+<body class="sans-serif">
+<div id="container">
+	<h1>Add-on Status</h1>
+	<p>We're working on getting your add-on validated. Keep hanging on!</p>
+	<div class="clear"></div>
+	<div class="g3">&nbsp;</div>
+	<div class="g6 notice_box">
+		<strong>Working...</strong>
+		<p id="status">Reticulating splines...</p>
+		<p>
+			Everybody's workin' for the weekend! <em>da na danananananana</em><br />
+			Everybody wants a new romance <em>heyyy yeaaaayyeyeaa</em><br />
+			Everybody's goin off the deep end <em>da na danananananana</em><br />
+			Everybody needs a second chance <em>whooaooa</em>
+		</p>
+	</div>
+	<div class="clear"></div>
+</div>
+</body>
+</html>
