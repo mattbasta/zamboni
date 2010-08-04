@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Mozilla Add-on Validator{% endblock %}
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/validator/upload.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-main" class="validator">
+	<h1>{{ _("Add-on Validator") }}</h1>
+	<div id="submission-area" class="rounded graybox">
+		<div id="upload-form">
+			<p>{{ _("Upload your add-on to the server and we'll test it using our automated validation tool. Validating your add-on will help it through the submission process. A valid add-on is a happy add-on!.") }}</p>
+			<p>{{ _("Only JAR and XPI package files are accepted.") }}</p>
+			{% if error == "upload" %}
+				<p class="formerror">{{ _("No file was submitted.") }}</p>
+			{% endif %}
+			{% if error == "addon" %}
+				<p class="formerror">{{ _("The file you submitted is not an XPI or JAR file.") }}</p>
+			{% endif %}
+			<form id="uploadform" action="save/" method="post" enctype="multipart/form-data" onsubmit="return do_upload(this, try_submit());">{{ csrf() }}
+				<p class="upload">
+					<label for="addon">{{ _("Upload an add-on to check:") }}</label>
+					<input type="file" name="addon" onchange="validate_package(this.value, this);" id="file_input" />
+				</p>
+				<p class="buttons">
+					<input id="submit_button" type="submit" value="{{ _('Upload and Validate') }}" />
+					<small id="disab_ext">{{ _("You must select a JAR or XPI file.") }}</small>
+					<small id="disab_addon">{{ _("The selected file doesn't appear to be an add-on package.") }}</small>
+				</p>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock content %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Mozilla Add-ons - Job {{ id }}{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/media/js/validator/results.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div id="content-main" class="validator">
+	<h1>{{ _("Add-on Validation Results") }}</h1>
+	<div id="validator-result" class="featured{% if not success %} {% if rejected %}rejected{% else %}errors{% endif %}{% endif %}">
+		<div class="featured-inner">
+		{% if rejected %}
+			<strong>{{ _("Your add-on was rejected.") }}</strong>
+			<p>{{ _("There are problems with your add-on that cause it to be unqualified for inclusion in the Mozilla Add-ons gallery. Fix the errors listed below and resubmit your add-on.") }}</p>
+		{% else %}
+			{% if success %}
+				<strong>{{ _("Your add-on passed validation!") }}</strong>
+				<p>{{ _("Congratulations! Your add-on has passed validation and is ready for submission to the Mozilla Add-ons gallery.") }}</p>
+			{% else %}
+				<strong>{{ _("Your add-on did not pass validation.") }}</strong>
+				<p>{{ _("Though your add-on was not outright rejected, we still found issues with it. Consider the problems listed below and resubmit after you have made corrections.") }}</p>
+			{% endif %}
+		{% endif %}
+		</div>
+	</div>
+	<div id="validator-stats" class="featured{% if val_msgs and use_ids %} half right{% endif %}">
+		<div class="featured-inner">
+		<dl>
+			<dt>{{ _("Detected Type:") }}</dt>
+			<dd>{{ _(type) }}</dd>
+			
+			<dt>{{ _("Errors:") }}</dt>
+			<dd>{{ errors }}</dd>
+			
+			<dt>{{ _("Warnings:") }}</dt>
+			<dd>{{ warnings }}</dd>
+			
+			<dt>{{ _("Notices:") }}</dt>
+			<dd>{{ infos }}</dd>
+		</dl>
+		</div>
+	</div>
+	{% if val_msgs and use_ids %}
+	<div id="validator-view" class="featured half left">
+		<div class="featured-inner">
+			{% if single_type %}
+			<p>
+				{% if errors %}
+				<label id="master_errors">
+					<input type="checkbox" checked="checked" value="-t-error" id="master-t-error" />
+					{{ _("Errors") }}
+					<span>({{errors}})</span>
+				</label>
+				{% endif %}
+				{% if warnings %}
+				<label id="master_warnings">
+					<input type="checkbox" checked="checked" value="-t-warning" id="master-t-warning" />
+					{{ _("Warnings") }}
+					<span>({{warnings}})</span>
+				</label>
+				{% endif %}
+				{% if infos %}
+				<label id="master_infos">
+					<input type="checkbox" checked="checked" value="-t-info" id="master-t-info" />
+					{{ _("Notices") }}
+					<span>({{infos}})</span>
+				</label>
+				{% endif %}
+			</p>
+			{% endif %}
+			<ul>
+				{{ build_visibilitytree(tree) }}
+			</ul>
+		</div>
+	</div>
+	{% endif %}
+	<div class="clear">&nbsp;</div>
+	{% if val_msgs %}
+	<ul class="validator_results">
+		{% for message in val_msgs %}
+		<li class="validator_{{ message['type'] }} {{ " ".join(message['id']) }} -t-{{message['type']}}">
+			<div class="error_wrap">
+				<strong>{{ _(message["message"]) }}</strong>
+				<p>{{ message["description"]|print_description }}</p>
+				{% if message["file"] != "" %}
+					<p class="file">
+						{{ message["file"]|print_file(message["line"]) }}
+					</p>
+				{% endif %}
+			</div>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>
+{% endblock %}

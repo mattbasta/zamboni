@@ -102,6 +102,8 @@ urlpatterns = patterns('',
     ('^recommended$',
      lambda r: redirect('browse.featured', permanent=True)),
 
+    ('^validator/', include('addonvalidator.urls')),
+
 )
 
 if settings.DEBUG:

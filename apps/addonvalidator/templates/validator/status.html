@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Mozilla Add-ons - Validating...{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+<!--
+window.task = "{{task}}";
+-->
+</script>
+<script type="text/javascript" src="/media/js/validator/status.js"></script>
+{% endblock %}
+
+{% block extrahead %}
+<noscript><meta http-equiv="refresh" content="3" /></noscript>
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div id="status-main" class="validator">
+	<div id="submission-area" class="rounded graybox">
+		<div class="notice_box">
+			<strong id="status">{{ _("Waiting for the server...") }}</strong>
+			<p id="waitplease">{{ _("Please be patient") }} :)</p>
+			<p id="hangon">{{ _("We're busy validating your add-on. It'll only be a few more minutes at most, promise.") }}</p>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -226,6 +226,7 @@ INSTALLED_APPS = (
     'amo',  # amo comes first so it always takes precedence.
     'access',
     'addons',
+    'addonvalidator',
     'api',
     'applications',
     'bandwagon',
