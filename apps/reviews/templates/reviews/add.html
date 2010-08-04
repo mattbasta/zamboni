@@ -7,9 +7,10 @@
 {% block content %}
 
 <header>
+  {% set review_link = url('reviews.list', addon.id) if addon.total_reviews else None %}
   {{ breadcrumbs([(addon.type_url(), amo.ADDON_TYPES[addon.type]),
                   (addon.get_url_path(), addon.name),
-                  (url('reviews.list', addon.id), _('Reviews')),
+                  (review_link, _('Reviews')),
                   (None, _('Add'))]) }}
   <h2>{{ title }}</h2>
 </header>
