@@ -1,7 +1,4 @@
-from django.conf.urls.defaults import patterns, url, include
-from django.shortcuts import redirect
-
-from . import views
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
     (r'^$', 'addonvalidator.views.index'),

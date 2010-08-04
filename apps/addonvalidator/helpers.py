@@ -3,11 +3,12 @@ from tower import ugettext as _
 
 from jingo import register, env
 
+
 @register.filter
 @jinja2.contextfilter
 def print_file(context, filename, line=None):
     "Prints a message's file path."
-    
+
     if isinstance(filename, list):
         if filename[-1] == '':
             filename[-1] = "(no file)"
@@ -19,36 +20,38 @@ def print_file(context, filename, line=None):
             output = output % " @ Line %s" % line
         else:
             output = output % ""
-        
+
         return jinja2.Markup(output)
     else:
         if filename == '':
             return "(no file)"
         return filename
 
+
 @register.filter
 @jinja2.contextfilter
 def print_description(context, description):
     "Prints a message's file path."
-    
+
     if isinstance(description, list):
         output = []
         for line in description:
             output.append(_(line))
-        
+
         return jinja2.Markup("</p><p>".join(output))
     else:
         return description
 
+
 @register.function
 def build_visibilitytree(tree, prefix=""):
-    
+    "Builds out that cute little check box tree on the results page"
     output = []
-    
+
     for key, value in tree.items():
         if key.startswith("__"):
             continue
-        
+
         t = env.get_template('validator/visibilitytree.html')
         markup = t.render(key=key,
                           value=value,
@@ -58,9 +61,9 @@ def build_visibilitytree(tree, prefix=""):
                           infos=value["__infos"],
                           messages=value["__messages"])
         output.append(jinja2.Markup(markup))
-    
+
     return jinja2.Markup("\n".join(output))
-    
+
 
 @register.function
 def translate_name(name):
@@ -85,4 +88,3 @@ def translate_name(name):
     if name in translation:
         return _(translation[name])
     return name
-    
