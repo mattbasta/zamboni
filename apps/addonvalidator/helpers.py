@@ -1,6 +1,5 @@
 import jinja2
 from tower import ugettext as _
-
 from jingo import register, env
 
 
@@ -9,13 +8,12 @@ from jingo import register, env
 def print_file(context, filename, line=None):
     "Prints a message's file path."
 
-    if isinstance(filename, list):
+    if isinstance(filename, (list, tuple)):
         if filename[-1] == '':
-            filename[-1] = "(no file)"
+            filename[-1] = _("(no file)")
         output = "%s"
         for name in filename:
-            output = output % ('<span class="line">%s%s</span>' % (name,
-                                                                   "%" + "s"))
+            output = output % ('<span class="line">%s%%s</span>' % name)
         if line is not None:
             output = output % " @ Line %s" % line
         else:
@@ -23,7 +21,7 @@ def print_file(context, filename, line=None):
 
         return jinja2.Markup(output)
     else:
-        if filename == '':
+        if not filename:
             return "(no file)"
         return filename
 
@@ -48,11 +46,11 @@ def build_visibilitytree(tree, prefix=""):
     "Builds out that cute little check box tree on the results page"
     output = []
 
+    t = env.get_template('validator/visibilitytree.html')
     for key, value in tree.items():
         if key.startswith("__"):
             continue
 
-        t = env.get_template('validator/visibilitytree.html')
         markup = t.render(key=key,
                           value=value,
                           prefix=prefix,
@@ -62,7 +60,17 @@ def build_visibilitytree(tree, prefix=""):
                           messages=value["__messages"])
         output.append(jinja2.Markup(markup))
 
-    return jinja2.Markup("\n".join(output))
+    return "\n".join(output)
+
+
+@register.function
+def result_class(rejected, success):
+    "Returns a class for the box that describes whether we succeeded or not."
+    
+    if rejected:
+        return "rejected"
+    elif not success:
+        return "errors"
 
 
 @register.function

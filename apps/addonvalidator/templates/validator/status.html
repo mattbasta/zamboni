@@ -1,13 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Mozilla Add-ons - Validating...{% endblock %}
+{% block title %}{{ page_title("Validating...") }}{% endblock %}
 
 {% block js %}
-<script type="text/javascript">
-<!--
-window.task = "{{task}}";
--->
-</script>
 <script type="text/javascript" src="/media/js/validator/status.js"></script>
 {% endblock %}
 
@@ -18,7 +13,7 @@ window.task = "{{task}}";
 {% block navbar %}{% endblock %}
 
 {% block content %}
-<div id="status-main" class="validator">
+<div id="status-main" class="validator" data-task="{{task}}">
 	<div id="submission-area" class="rounded graybox">
 		<div class="notice_box">
 			<strong id="status">{{ _("Waiting for the server...") }}</strong>

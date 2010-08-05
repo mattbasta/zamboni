@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import os
 import random
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
@@ -16,19 +17,16 @@ from addonvalidator.tasks import start_job
 def index(request):
     "The upload page"
 
-    error = None
-    if "error" in request.GET:
-        error = request.GET["error"]
+    error = request.GET.get("error", None)
 
-    data = {"error": error,
-            "title": "Add-on Validator"}
+    data = {"error": error}
     return jingo.render(request, 'validator/upload.html', data)
 
 
 def save(request):
     "The page that handles the submitted file"
 
-    is_ajax = "ajax" in request.GET
+    is_ajax = request.is_ajax()
 
     if "addon" not in request.FILES:
         if not is_ajax:
@@ -39,7 +37,7 @@ def save(request):
     # Save the file to the temporary directory
 
     file_ = request.FILES["addon"]
-    extension = file_.name.split('.')[-1]
+    extension = os.path.splitext(file_.name)[-1]
 
     if not _verify_submitted_addon(file_):
         return HttpResponseRedirect("/validator?error=addon")
@@ -86,7 +84,7 @@ def save(request):
 def _verify_submitted_addon(addon):
     "Verifies a file that is submitted as an addon"
 
-    extension = addon.name.split(".")[-1]
+    extension = os.path.splitext(addon.name)[-1]
     if extension not in ("xpi", "jar"):
         return False
 
@@ -149,10 +147,7 @@ def result(request, task_id):
     warnings = results_json["warnings"]
     infos = results_json["infos"]
 
-    single_type = (not errors and not warnings) or \
-                  (not errors and not infos) or \
-                  (not warnings and not infos)
-    single_type = not single_type
+    single_type = bool(errors) ^ bool(warnings) ^ bool(infos)
 
     data = {"val_msgs": results_json["messages"],
             "rejected": results_json["rejected"],

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Mozilla Add-on Validator{% endblock %}
+{% block title %}{{ page_title("Add-on Validator") }}{% endblock %}
 {% block extrahead %}
 <script type="text/javascript" src="/media/js/validator/upload.js"></script>
 {% endblock %}
@@ -11,7 +11,14 @@
 	<h1>{{ _("Add-on Validator") }}</h1>
 	<div id="submission-area" class="rounded graybox">
 		<div id="upload-form">
-			<p>{{ _("Upload your add-on to the server and we'll test it using our automated validation tool. Validating your add-on will help it through the submission process. A valid add-on is a happy add-on!.") }}</p>
+			<p>
+				{% trans %}
+				Upload your add-on to the server and we'll test it using our
+				automated validation tool. Validating your add-on will help it
+				through the submission process. A valid add-on is a happy
+				add-on!.
+				{% endtrans %}
+			</p>
 			<p>{{ _("Only JAR and XPI package files are accepted.") }}</p>
 			{% if error == "upload" %}
 				<p class="formerror">{{ _("No file was submitted.") }}</p>
@@ -22,7 +29,7 @@
 			<form id="uploadform" action="save/" method="post" enctype="multipart/form-data" onsubmit="return do_upload(this, try_submit());">{{ csrf() }}
 				<p class="upload">
 					<label for="addon">{{ _("Upload an add-on to check:") }}</label>
-					<input type="file" name="addon" onchange="validate_package(this.value, this);" id="file_input" />
+					<input type="file" name="addon" id="file_input" />
 				</p>
 				<p class="buttons">
 					<input id="submit_button" type="submit" value="{{ _('Upload and Validate') }}" />

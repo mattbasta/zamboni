@@ -328,6 +328,9 @@ MINIFY_BUNDLES = {
         'zamboni/discovery-pane': (
             'css/zamboni/discovery-pane.css',
         ),
+        'zamboni/validator': (
+            'css/zamboni/validator.css',
+        ),
     },
     'js': {
         # JS files common to the entire site.
@@ -362,6 +365,9 @@ MINIFY_BUNDLES = {
             'js/zamboni/jquery-ui/custom-1.8.2.min.js',
             'js/zamboni/collections.js',
         ),
+        "validator/upload": ("js/validator/upload.js"),
+        "validator/status": ("js/validator/status.js"),
+        "validator/results": ("js/validator/results.js"),
     }
 }
 

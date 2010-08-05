@@ -53,6 +53,7 @@ var validator = {
 	message_pos: 0
 };
 $(document).ready(function() {
+    window.task = document.getElementById("status-main").getAttribute("data-task");
 	setTimeout(function() {
 		validator.interval = setInterval(validator.updateStatus, 3000);
 	}, 1000);

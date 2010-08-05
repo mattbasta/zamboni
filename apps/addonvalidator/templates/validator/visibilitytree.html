@@ -1,12 +1,12 @@
 <li>
-	<input type="checkbox" value="{{key}}" class="{{prefix}}" checked="checked" id="{{key}}" />
+	<input type="checkbox" value="{{ key }}" class="{{ prefix }}" checked="checked" id="{{ key }}" />
 	<label for="{{key}}">
 		<span>{{ translate_name(key) }}</span>
 		{% if not messages %}
 		<span class="messages">
-			{% if errors %}<span class="errors">{{errors}}</span>{% endif %}
-			{% if warnings %}<span class="warnings">{{warnings}}</span>{% endif %}
-			{% if infos %}<span class="infos">{{infos}}</span>{% endif %}
+			{% if errors %}<span class="errors">{{ errors }}</span>{% endif %}
+			{% if warnings %}<span class="warnings">{{ warnings }}</span>{% endif %}
+			{% if infos %}<span class="infos">{{ infos }}</span>{% endif %}
 		</span>
 		{% else %}
 		<span class="count">&times;{{ errors + warnings + infos }}</span>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Mozilla Add-ons - Job {{ id }}{% endblock %}
+{% block title %}{{ page_title("Job %s" % id[:10]) }}{% endblock %}
 
 {% block js %}
 <script type="text/javascript" src="/media/js/validator/results.js"></script>
@@ -10,18 +10,35 @@
 
 <div id="content-main" class="validator">
 	<h1>{{ _("Add-on Validation Results") }}</h1>
-	<div id="validator-result" class="featured{% if not success %} {% if rejected %}rejected{% else %}errors{% endif %}{% endif %}">
+	{% set class = result_class(rejected, success) %}
+	<div id="validator-result" class="featured {{ class }}">
 		<div class="featured-inner">
 		{% if rejected %}
 			<strong>{{ _("Your add-on was rejected.") }}</strong>
-			<p>{{ _("There are problems with your add-on that cause it to be unqualified for inclusion in the Mozilla Add-ons gallery. Fix the errors listed below and resubmit your add-on.") }}</p>
+			<p>
+				{% trans %}
+				There are problems with your add-on that cause it to be
+				unqualified for inclusion in the Mozilla Add-ons gallery.
+				Fix the errors listed below and resubmit your add-on.
+				{% endtrans %}
+			</p>
 		{% else %}
 			{% if success %}
 				<strong>{{ _("Your add-on passed validation!") }}</strong>
-				<p>{{ _("Congratulations! Your add-on has passed validation and is ready for submission to the Mozilla Add-ons gallery.") }}</p>
+				<p>
+					{% trans %}
+					Congratulations! Your add-on has passed validation and is
+					ready for submission to the Mozilla Add-ons gallery.
+					{% endtrans %}</p>
 			{% else %}
 				<strong>{{ _("Your add-on did not pass validation.") }}</strong>
-				<p>{{ _("Though your add-on was not outright rejected, we still found issues with it. Consider the problems listed below and resubmit after you have made corrections.") }}</p>
+				<p>
+					{% trans %}
+					Though your add-on was not outright rejected, we still
+					found issues with it. Consider the problems listed below
+					and resubmit after you have made corrections
+					{% endtrans %}
+				</p>
 			{% endif %}
 		{% endif %}
 		</div>

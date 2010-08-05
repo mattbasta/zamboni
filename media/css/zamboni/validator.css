@@ -1,0 +1,137 @@
+#content-main.validator {
+    margin:0 auto;
+    width:65%;
+    clear:both;
+}
+#status-main.validator {
+    margin:0 auto;
+    width:45%;
+    clear:both;
+}
+#status-main #submission-area {
+    padding:40px;
+    background:rgba(255,255,255,0.4);
+    text-shadow:0 0 10px #FFFFFF;
+}
+.validator .buttons small {
+    display:none;
+}
+
+.validator .notice_box {
+	text-align:center;
+	font-size:1.2em;
+	line-height:1.75em;
+}
+.validator .notice_box strong {font-size:2em;}
+
+.validator_results li {
+    padding:0.3em;
+    margin:5px 0 10px;
+    background:#e7e7e7;
+    border:1px solid #aaa;
+    border-radius:4px;
+    -moz-border-radius:4px;
+    box-shadow:0 0 4px #bbb;
+    -moz-box-shadow:0 0 4px #bbb;
+    -webkit-box-shadow:0 0 4px #bbb;
+}
+
+.validator_results .validator_error {
+    background:#fb9;
+    border:1px solid #b00;
+}
+.validator_results .validator_warning {
+    background:#ec7;
+    border:1px solid #b80;
+}
+.validator_results li .error_wrap {
+    background:#fff;
+    padding:0.3em 0.6em;
+}
+.validator_results li .file {
+    font-family:monospace;
+    margin:0;
+}
+.validator_results .file .line {
+    display:block;
+}
+.validator_results .file .line .line {
+    padding-left:1em;
+}
+
+
+#validator-result {border-color:#5C5;}
+#validator-result.errors {border-color:#EA0;}
+#validator-result.rejected {border-color:#C54;}
+#validator-result .featured-inner {
+    padding:1em 1em 0;
+    font-size:1.1em;
+    line-height:1.75em;
+}
+
+#validator-stats .featured-inner {padding:0.5em 1.5em;}
+#validator-stats dt {
+    margin:0 1em 1em 0;
+    float:left;
+    clear:left;
+}
+#validator-stats dd {
+    margin-top:1em;
+}
+/*
+#validator-stats dt {
+    height:1em;
+    margin-bottom:2em;
+}
+#validator-stats dd {
+    padding-top:3em;
+    margin-left:-50%;
+}
+#validator-stats dd,
+#validator-stats dt {
+    width:50%;
+    float:left;
+}*/
+
+#validator-view p {
+    padding:1em 0;
+    text-align:center;
+}
+#validator-view p label {
+    margin:0 1em;
+    padding:0.25em;
+    color:#fff;
+    background:#aaa;
+    border-radius:3px;
+    -moz-border-radius:3px;
+}
+#validator-view #master_errors {background:#b00;}
+#validator-view #master_warnings {background:#e90;}
+#validator-view p label span {
+    padding:0 0.5em;
+    font-weight:normal;
+}
+#validator-view .featured-inner {padding:0 1.5em;}
+#validator-view ul ul {padding:0 0 0.25em 1.55em;}
+#validator-view ul label {font-weight:normal;}
+#validator-view ul label .messages span {
+    font-size:0.8em;
+    font-weight:bold;
+    background:#aaa;
+    color:#fff;
+    padding:0 0.25em;
+    border-radius:2px;
+    -moz-border-radius:2px;
+}
+#validator-view ul label .messages span.errors {background:#b00;}
+#validator-view ul label .messages span.warnings {background:#e90;}
+#validator-view ul label .count {color:#aaa;}
+
+.featured.half {
+    clear:none;
+    width:47%;
+}
+.featured.half.left {float:left;}
+.featured.half.right {float:right;}
+
+.clear {clear:both;font-size:0;line-height:1em;}

@@ -123,3 +123,9 @@ function do_upload(form, allowed) {
 	// Let the asynchronous groove take you away...
 	return false;
 }
+
+$(document).ready(function(){
+    document.getElementById("file_input").onchange = function() {
+        validate_package(this.value, this);
+    }
+});
