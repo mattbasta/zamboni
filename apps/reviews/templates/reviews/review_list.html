@@ -48,6 +48,9 @@
 
 
   {% block review_list %}
+  {% if not reviews.object_list %}
+    <p><a href="{{addon.get_url_path()}}#review-box">{{ _('Be the first to write a review.') }}</a><p>
+  {% endif %}
   {% for review in reviews.object_list %}
     {% include "reviews/review.html" %}
     {% if review.id in replies %}
