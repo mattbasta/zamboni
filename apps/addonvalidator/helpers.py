@@ -58,9 +58,9 @@ def build_visibilitytree(tree, prefix=""):
                           warnings=value["__warnings"],
                           infos=value["__infos"],
                           messages=value["__messages"])
-        output.append(jinja2.Markup(markup))
+        output.append(markup)
 
-    return "\n".join(output)
+    return jinja2.Markup("\n".join(output))
 
 
 @register.function

@@ -26,7 +26,7 @@ def index(request):
 def save(request):
     "The page that handles the submitted file"
 
-    is_ajax = request.is_ajax()
+    is_ajax = "ajax" in request.GET
 
     if "addon" not in request.FILES:
         if not is_ajax:
@@ -37,10 +37,13 @@ def save(request):
     # Save the file to the temporary directory
 
     file_ = request.FILES["addon"]
-    extension = os.path.splitext(file_.name)[-1]
+    extension = os.path.splitext(file_.name)[-1][1:]
 
     if not _verify_submitted_addon(file_):
-        return HttpResponseRedirect("/validator?error=addon")
+        if not is_ajax:
+            return HttpResponseRedirect("/validator?error=addon")
+        else:
+            return HttpResponse('{"error":true}')
 
     # Give the job a local ID
     tempname = hashlib.sha1(str(random.random())).hexdigest()
@@ -84,8 +87,8 @@ def save(request):
 def _verify_submitted_addon(addon):
     "Verifies a file that is submitted as an addon"
 
-    extension = os.path.splitext(addon.name)[-1]
-    if extension not in ("xpi", "jar"):
+    extension = os.path.splitext(addon.name)[-1].lower()
+    if extension not in (".xpi", ".jar"):
         return False
 
     return True
@@ -159,5 +162,5 @@ def result(request, task_id):
             "infos": infos,
             "tree": tree,
             "use_ids": (errors + warnings + infos) > 2,
-            "single_type": single_type}
+            "single_type": not single_type}
     return jingo.render(request, 'validator/result.html', data)

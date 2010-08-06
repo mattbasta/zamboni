@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls.defaults import patterns, include, url
 from . import views
 
 validator_patterns = patterns('',
@@ -7,8 +7,8 @@ validator_patterns = patterns('',
 )
 
 urlpatterns = patterns('',
-    url(r'^$', views.index, name="validator.upload"),
-    url(r'^save/$', views.save, name="validator.save"),
-    (r'^status/(?P<task_id>.{36})/', include(validator_patterns)),
-    url(r'^result/(?P<task_id>.{36})$', views.result, name="validator.result")
+    url(r'^/$', views.index, name="validator.upload"),
+    url(r'^/save/$', views.save, name="validator.save"),
+    (r'^/status/(?P<task_id>.{36})/', include(validator_patterns)),
+    url(r'^/result/(?P<task_id>.{36})$', views.result, name="validator.result")
 )

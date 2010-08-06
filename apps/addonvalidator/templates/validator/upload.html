@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}{{ page_title("Add-on Validator") }}{% endblock %}
-{% block extrahead %}
+{% block js %}
 <script type="text/javascript" src="/media/js/validator/upload.js"></script>
+{% endblock %}
+{% block extrahead %}
+{{ css('zamboni/validator') }}
 {% endblock %}
 
 {% block content %}
