@@ -17,6 +17,7 @@ def start_job(path, task_id=None):
 
     # Create an empty error report for the package with no fancy output.
     eb = ErrorBundle(results, True)
+    eb.determined = True
     # The value here should match Remora's ($status == STATUS_LISTED)
     eb.save_resource("listed", True)
     validator.main.prepare_package(eb,

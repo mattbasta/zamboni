@@ -113,14 +113,17 @@ def poll(request, task_id):
             data = {"status": "done"}
         else:
             # Consider what the task status pairs up with.
-            statuses = {"PENDING": "queued",
-                        "STARTED": "working"}
+            statuses = {"PENDING": {"status": "queued",
+                                    "message": _("Preparing results...")},
+                        "STARTED": {"status": "working",
+                                    "message": _("Cleaning up...")}}
             if result.status in statuses:
-                data = {"status": statuses[result.status]}
+                data = statuses[result.status]
             else:
                 data = {"status": "done"}
     else:
-        data = {"status": "queued"}
+        data = {"status": "queued",
+                "message": _("Waiting to be validated...")}
 
     jdata = json.dumps(data)
 
@@ -155,6 +158,10 @@ def result(request, task_id):
     data = {"val_msgs": results_json["messages"],
             "rejected": results_json["rejected"],
             "success": results_json["success"],
+            "has_name": "name" in results_json["metadata"],
+            "has_id": "id" in results_json["metadata"],
+            "has_version": "version" in results_json["metadata"],
+            "metadata": results_json["metadata"],
             "type": types[results_json["detected_type"]],
             "id": task_id,
             "warnings": warnings,

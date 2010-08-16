@@ -15,7 +15,7 @@ def print_file(context, filename, line=None):
         for name in filename:
             # L10n: %s is the file name, ignore %%s
             output = output % ('<span class="line">%s%%s</span>' % name)
-        if line is not None:
+        if isinstance(line, int) and line > 0:
             # L10n: %s is a line number
             output = output % _(" @ Line %s") % line
         else:
@@ -36,7 +36,7 @@ def print_description(context, description):
     if isinstance(description, list):
         output = []
         for line in description:
-            output.append(line)
+            output.append(print_description(context, line))
 
         return jinja2.Markup("</p><p>".join(output))
     else:

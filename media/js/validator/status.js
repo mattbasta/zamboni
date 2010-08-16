@@ -23,8 +23,7 @@ var validator = {
 				if(!data)
 					return;
 				if(!("status" in data)) {
-					alert("There was an error processing your add-on.");
-					window.location.href = "/validator/";
+					window.location.href = "/validator/?error=validation";
 					return;
 				}
 				

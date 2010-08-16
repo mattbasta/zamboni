@@ -48,19 +48,45 @@
 	</div>
 	<div id="validator-stats" class="featured{% if val_msgs and use_ids %} half right{% endif %}">
 		<div class="featured-inner">
-		<dl>
-			<dt>{{ _("Detected Type:") }}</dt>
-			<dd>{{ _(type) }}</dd>
+		<table>
+			<tr>
+				<td>{{ _("Detected Type:") }}</td>
+				<td>{{ type }}</td>
+			</tr>
+			{% if has_name %}
+			<tr>
+				<td>{{ _("Add-on Name:") }}</td>
+				<td>{{ metadata["name"] }}</td>
+			</tr>
+			{% endif %}
 			
-			<dt>{{ _("Errors:") }}</dt>
-			<dd>{{ errors }}</dd>
+			{% if has_version %}
+			<tr>
+				<td>{{ _("Add-on Version:") }}</td>
+				<td>{{ metadata["version"] }}</td>
+			</tr>
+			{% endif %}
 			
-			<dt>{{ _("Warnings:") }}</dt>
-			<dd>{{ warnings }}</dd>
+			{% if has_id %}
+			<tr>
+				<td>{{ _("Add-on ID:") }}</td>
+				<td>{{ metadata["id"] }}</td>
+			</tr>
+			{% endif %}
 			
-			<dt>{{ _("Notices:") }}</dt>
-			<dd>{{ infos }}</dd>
-		</dl>
+			<tr>
+				<td>{{ _("Errors:") }}</td>
+				<td>{{ errors }}</td>
+			</tr>
+			<tr>
+				<td>{{ _("Warnings:") }}</td>
+				<td>{{ warnings }}</td>
+			</tr>
+			<tr>
+				<td>{{ _("Notices:") }}</td>
+				<td>{{ infos }}</td>
+			</tr>
+		</table>
 		</div>
 	</div>
 	{% if val_msgs and use_ids %}

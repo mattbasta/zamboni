@@ -1,6 +1,6 @@
 <li>
 	<input type="checkbox" value="{{ key }}" class="{{ prefix }}" checked="checked" id="{{ key }}" />
-	<label for="{{key}}">
+	<label for="{{ key }}">
 		<span>{{ translate_name(key) }}</span>
 		{% if not messages %}
 		<span class="messages">
@@ -13,6 +13,6 @@
 		{% endif %}
 	</label>
 	{% if errors or warnings or infos %}
-		<ul>{{build_visibilitytree(value, prefix + " -i-" + key)}}</ul>
+		<ul>{{ build_visibilitytree(value, prefix + " -i-" + key) }}</ul>
 	{% endif %}
 </li>

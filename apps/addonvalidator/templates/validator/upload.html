@@ -29,6 +29,9 @@
 			{% if error == "addon" %}
 				<p class="formerror">{{ _("The file you submitted is not an XPI or JAR file.") }}</p>
 			{% endif %}
+			{% if error == "validation" %}
+				<p class="formerror">{{ _("Your add-on could not be validated.") }}</p>
+			{% endif %}
 			<form id="uploadform" action="save/" method="post" enctype="multipart/form-data" onsubmit="return do_upload(this, try_submit());">{{ csrf() }}
 				<p class="upload">
 					<label for="addon">{{ _("Upload an add-on to check:") }}</label>
