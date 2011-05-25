@@ -1,11 +1,13 @@
 import json
 import logging
 import os
+import shutil
 import sys
 import traceback
 
 from django.conf import settings
 from django.core.management import call_command
+from amo.utils import slugify
 from celeryutils import task
 
 from addons.models import Addon
@@ -160,3 +162,28 @@ def resize_preview(src, thumb_dst, full_dst, **kw):
         return True
     except Exception, e:
         log.error("Error saving preview: %s" % e)
+
+
+@task
+def packager(data, feature_set, **kw):
+    """Build an add-on based on input data."""
+    log.info('[1@None] Packaging add-on')
+
+    # "Lock" the file by putting .lock in its name.
+    from devhub.views import packager_path
+    xpi_path = packager_path('%s.lock' % data['uuid'])
+    log.info('Saving package to: %s' % xpi_path)
+
+    from packager.main import packager
+
+    data['slug'] = slugify(data['name']).replace('-', '_')
+    features = set([k for k, v in feature_set.items() if v])
+
+    packager(data, xpi_path, features)
+
+    # Unlock the file and make it available.
+    try:
+        shutil.move(xpi_path, packager_path(data['uuid']))
+    except IOError:
+        log.error('Error unlocking add-on: %s' % xpi_path)
+
