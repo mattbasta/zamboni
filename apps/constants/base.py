@@ -234,6 +234,9 @@ PERSONA_IMAGE_SIZES = {
     'footer': [None, (3000, 100)],
 }
 
+# Size requirements for uploaded app icons
+APP_ICON_MIN_SIZE = (128, 128)
+
 # Accepted image MIME-types
 IMG_TYPES = ('image/png', 'image/jpeg', 'image/jpg')
 VIDEO_TYPES = ('video/webm',)
