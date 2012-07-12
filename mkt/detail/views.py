@@ -2,6 +2,8 @@ from django import http
 from django.shortcuts import redirect
 
 import jingo
+import jinja2js
+jinja2js.set_env(jingo.env)
 from session_csrf import anonymous_csrf_exempt
 from tower import ugettext as _
 
@@ -31,7 +33,7 @@ def detail(request, addon):
     }
     if addon.is_public():
         ctx['abuse_form'] = AbuseForm(request=request)
-    return jingo.render(request, 'detail/app.html', ctx)
+    return jinja2js.render_or_extract(request, 'detail/app.html', ctx)
 
 
 @addon_all_view
