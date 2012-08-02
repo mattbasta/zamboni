@@ -13,7 +13,7 @@ import amo.tests
 from amo.tests.test_helpers import get_image_path
 from amo.utils import rm_local_tmp_dir
 from addons import forms, cron
-from addons.models import Addon, AddonDeviceType, Category, DeviceType, Webapp
+from addons.models import Addon, AddonDeviceType, Category, Webapp
 from files.helpers import copyfileobj
 from tags.models import Tag, AddonTag
 from addons.forms import DeviceTypeForm
@@ -286,11 +286,10 @@ class TestDeviceTypeForm(amo.tests.TestCase):
     fixtures = ['base/337141-steamcube']
 
     def test_device_types(self):
-        dtype = DeviceType.objects.create(name='fligphone', class_name='phone')
         webapp = Webapp.objects.get(id=337141)
         addondt = AddonDeviceType.objects.create(addon=webapp,
-                                                 device_type=dtype)
-        types = DeviceType.objects.values_list('id', flat=True)
-        form = DeviceTypeForm(addon=webapp)
-        eq_(webapp.device_types, [addondt.device_type])
-        eq_(list(form.initial['device_types']), list(types))
+                                                 device_type=amo.DEVICE_MOBILE)
+        types = [amo.DEVICE_MOBILE]
+        eq_(webapp.device_types, [amo.DEVICE_MOBILE])
+        form = forms.DeviceTypeForm(addon=webapp)
+        eq_(list(form.initial['device_types']), types)

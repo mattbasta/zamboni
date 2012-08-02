@@ -135,6 +135,7 @@ def details(request, addon_id, addon):
     }
 
     if request.POST and all(f.is_valid() for f in forms.itervalues()):
+        #import pdb; pdb.set_trace()
         addon = form_basic.save(addon)
         form_devices.save(addon)
         form_cats.save()

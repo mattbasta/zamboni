@@ -27,7 +27,7 @@ from addons.models import (Addon, AddonCategory, AddonDependency,
                            AddonDeviceType, AddonRecommendation, AddonType,
                            AddonUpsell, AddonUser, AppSupport, BlacklistedGuid,
                            Category, Charity, CompatOverride,
-                           CompatOverrideRange, DeviceType, FrozenAddon,
+                           CompatOverrideRange, FrozenAddon,
                            IncompatibleVersions, Persona, Preview)
 from addons.search import setup_mapping
 from applications.models import Application, AppVersion
@@ -1259,7 +1259,7 @@ class TestAddonDelete(amo.tests.TestCase):
         AddonDependency.objects.create(addon=addon,
             dependent_addon=addon)
         AddonDeviceType.objects.create(addon=addon,
-            device_type=DeviceType.objects.create())
+            device_type=amo.DEVICE_DESKTOP)
         AddonRecommendation.objects.create(addon=addon,
             other_addon=addon, score=0)
         AddonUpsell.objects.create(free=addon, premium=addon)

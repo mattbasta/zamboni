@@ -10,7 +10,7 @@ from tastypie.serializers import Serializer
 from tastypie.resources import ALL_WITH_RELATIONS
 
 from addons.forms import CategoryFormSet, DeviceTypeForm
-from addons.models import AddonUser, Category, DeviceType, Preview
+from addons.models import AddonUser, Category, Preview
 import amo
 from amo.decorators import write
 from amo.utils import no_translation
@@ -130,8 +130,8 @@ class AppResource(MarketplaceResource):
 
     def devices(self, data):
         with no_translation():
-            names = dict([(str(n.name).lower(), n.pk)
-                          for n in DeviceType.objects.all()])
+            names = dict([(n.class_name, n.id)
+                          for n in constants.DEVICE_TYPES.values()])
         filtered = [names.get(n, n) for n in data.get('device_types', [])]
         return {'device_types': filtered}
 
@@ -244,23 +244,6 @@ class CategoryResource(MarketplaceResource):
         always_return_data = True
         resource_name = 'category'
         serializer = Serializer(formats=['json'])
-
-
-class DeviceTypeResource(MarketplaceResource):
-
-    class Meta:
-        queryset = DeviceType.objects.all()
-        list_allowed_methods = ['get']
-        allowed_methods = ['get']
-        fields = ['name', 'id']
-        always_return_data = True
-        resource_name = 'devicetype'
-        serializer = Serializer(formats=['json'])
-
-    def dehydrate(self, bundle):
-        with no_translation():
-            bundle.data['name'] = str(bundle.obj.name).lower()
-        return bundle
 
 
 class PreviewResource(MarketplaceResource):
