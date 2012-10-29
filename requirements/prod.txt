@@ -33,7 +33,6 @@ gunicorn==0.15.0
 hera==0.1.2
 html5lib==0.90
 httplib2==0.7.6
-importlib==1.0.2
 kombu==2.1.2
 metlog-py==0.9.8
 metlog-cef==0.2
@@ -80,6 +79,7 @@ statsd==1.0.0
 -e git://github.com/mozilla/django-recaptcha.git@bbe6a921e95e4961b028b7eb5ea197d3fb54aa9a#egg=django-recaptcha
 -e git://github.com/washort/django-waffle.git@19fe01f48008efc02e357554d49cc3b6e0b1c854#egg=django-waffle
 -e git://github.com/andymckay/django-uuidfield.git@029dd1263794ec36c327617cd6c2346da81c8c33#egg=django-uuidfield
+-e git://github.com/mattbasta/safe-importlib.git@002cf0de8135fc97dd6e16c649b5229a4cfd1f49#egg=importlib
 
 ## Out of date or not sure on pypi.
 -e git://github.com/jbalogh/django-mobility.git@e2b60a1f96e4c4aed736395c01bf707e969d8e83#egg=django-mobility
