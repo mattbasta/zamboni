@@ -837,8 +837,12 @@ class AppAppealForm(happyforms.Form):
 
     def save(self):
         version = self.product.versions.latest()
-        version.update(approvalnotes=self.cleaned_data['notes'])
-        amo.log(amo.LOG.EDIT_VERSION, self.product, version)
+        notes = self.cleaned_data['notes']
+        if notes:
+            amo.log(amo.LOG.WEBAPP_RESUBMIT, self.product, version,
+                    details={'comments': notes})
+        else:
+            amo.log(amo.LOG.WEBAPP_RESUBMIT, self.product, version)
         # Mark app and file as pending again.
         self.product.update(status=amo.WEBAPPS_UNREVIEWED_STATUS)
         version.all_files[0].update(status=amo.WEBAPPS_UNREVIEWED_STATUS)

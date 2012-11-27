@@ -27,27 +27,29 @@ from users.cron import reindex_users
 from lib.es.models import Reindexing
 from lib.es.utils import database_flagged
 
-if django_settings.MARKETPLACE:
-    from mkt.stats.cron import index_mkt_stats
-    from mkt.stats.search import setup_mkt_indexes as put_mkt_stats_mapping
 
+_INDEXES = {}
 
 def index_stats(index=None, aliased=True):
     """Indexes the previous 365 days."""
     call_command('index_stats', addons=None)
 
 
-_INDEXES = {'stats': [index_stats],
-            'apps': [reindex_addons,
-                     reindex_apps,
-                     reindex_collections,
-                     reindex_users]}
-
 if django_settings.MARKETPLACE:
-    _INDEXES['stats'].extend([index_mkt_stats])
-else:
-    _INDEXES['apps'].append(compatibility_report)
+    # This imports marketplace stats, which then adds in the marketplace
+    # inapp table. When you do that and delete an addon, the marketplace
+    # then tries to delete from the non-existant table.
+    #
+    # This really only affects tests where the table does not exist.
+    from mkt.stats.cron import index_mkt_stats
+    from mkt.stats.search import setup_mkt_indexes as put_mkt_stats_mapping
 
+    _INDEXES = {'stats': [index_stats, index_mkt_stats],
+                'apps': [reindex_addons,
+                         reindex_apps,
+                         reindex_collections,
+                         reindex_users,
+                         compatibility_report]}
 
 logger = logging.getLogger('z.elasticsearch')
 DEFAULT_NUM_REPLICAS = 0
@@ -174,8 +176,7 @@ def create_mapping(new_index, alias, num_replicas=DEFAULT_NUM_REPLICAS,
         put_amo_mapping(new_index, aliased=False)
     else:
         put_stats_mapping(new_index, aliased=False)
-        if django_settings.MARKETPLACE:
-            put_mkt_stats_mapping(new_index, aliased=False)
+        put_mkt_stats_mapping(new_index, aliased=False)
 
     # Create new index
     index_url = url('/%s' % new_index)
@@ -259,6 +260,11 @@ class Command(BaseCommand):
         over the old ones so the search feature
         works while the indexation occurs
         """
+        if not django_settings.MARKETPLACE:
+            raise CommandError('This command affects both the marketplace and '
+                               'AMO ES storage. But the command can only be '
+                               'run from the Marketplace.')
+
         force = kwargs.get('force', False)
 
         if database_flagged() and not force:

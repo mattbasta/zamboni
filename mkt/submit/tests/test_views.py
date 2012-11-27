@@ -27,6 +27,7 @@ from translations.models import Translation
 from users.models import UserProfile
 
 import mkt
+from mkt.submit.forms import NewWebappVersionForm
 from mkt.submit.models import AppSubmissionChecklist
 from mkt.submit.decorators import read_dev_agreement_required
 from mkt.webapps.models import AddonExcludedRegion as AER, Webapp
@@ -253,6 +254,19 @@ class TestCreateWebApp(BaseWebAppTest):
             'Unexpected helpful error (trap_duplicate)')
         assert 'already exists' not in r.content, (
             'Unexpected validation error (verify_app_domain)')
+
+
+    def test_no_upload(self):
+        data = {'free': ['free-desktop']}
+        res = self.client.post(self.url, data, follow=True)
+        eq_(res.context['form'].errors,
+            {'upload': NewWebappVersionForm.upload_error})
+
+    def test_bad_upload(self):
+        data = {'free': ['free-desktop'], 'upload': 'foo'}
+        res = self.client.post(self.url, data, follow=True)
+        eq_(res.context['form'].errors,
+            {'upload': NewWebappVersionForm.upload_error})
 
     def test_hint_for_same_manifest(self):
         self.create_switch(name='webapps-unique-by-domain')
@@ -549,6 +563,7 @@ class TestDetails(TestSubmit):
             'support_email': 'krupa+to+the+rescue@goodreads.com',
             'categories': [self.cat1.id],
             'flash': '1',
+            'publish': '1'
         }
         # Add the required screenshot.
         data.update(self.preview_formset({
@@ -566,20 +581,24 @@ class TestDetails(TestSubmit):
         addon = self.get_webapp()
 
         # Build a dictionary of expected results.
-        expected = {
+        expected_data = {
             'name': 'Test name',
             'app_slug': 'testname',
             'summary': 'Hello!',
             'description': 'desc',
             'privacy_policy': 'XXX &lt;script&gt;alert("xss")&lt;/script&gt;',
-            'uses_flash': 'True',
+            'uses_flash': True,
+            'make_public': amo.PUBLIC_IMMEDIATELY
         }
-        expected.update(expected)
+        if expected:
+            expected_data.update(expected)
 
-        for field, expected in expected.iteritems():
+        for field, expected in expected_data.iteritems():
             got = unicode(getattr(addon, field))
+            expected = unicode(expected)
             eq_(got, expected,
                 'Expected %r for %r. Got %r.' % (expected, field, got))
+
         self.assertSetEqual(addon.device_types, self.device_types)
 
     def test_success(self):
@@ -606,6 +625,19 @@ class TestDetails(TestSubmit):
         r = self.client.post(self.url, data)
         self.assertNoFormErrors(r)
         self.check_dict(data=data)
+        self.webapp = self.get_webapp()
+        self.assert3xx(r, self.get_url('done'))
+
+    def test_success_for_public_waiting(self):
+        self._step()
+
+        data = self.get_dict()
+        del data['publish']
+
+        r = self.client.post(self.url, data)
+        self.assertNoFormErrors(r)
+
+        self.check_dict(data=data, expected={'make_public': amo.PUBLIC_WAIT})
         self.webapp = self.get_webapp()
         self.assert3xx(r, self.get_url('done'))
 

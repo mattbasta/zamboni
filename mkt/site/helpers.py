@@ -139,9 +139,8 @@ def product_as_dict(request, product, purchased=None, receipt_type=None,
                 'fullUrl': jinja2.escape(p.image_url),
                 'type': jinja2.escape(p.filetype),
                 'thumbUrl': jinja2.escape(p.thumbnail_url),
+                'caption': jinja2.escape(p.caption) if p.caption else ''
             }
-            if p.caption:
-                preview.update(caption=jinja2.escape(p.caption))
             previews.append(preview)
         ret.update({'previews': previews})
 
@@ -229,38 +228,30 @@ def market_tile(context, product, link=True, src=''):
         if not request.MOBILE and product.device_types:
             url = reverse('ecosystem.installation')
             if product.device_types == [amo.DEVICE_DESKTOP]:
-                notices.append(
-                    _('Desktop support is temporarily disabled ('
-                      '<b data-href="{url}">learn more</b>).').format(url=url))
+                classes.append('incompatible')
+                # notices.append(
+                #     _('Desktop support is temporarily disabled ('
+                #       '<b data-href="{url}">learn more</b>).').format(url=url))
             elif amo.DEVICE_DESKTOP in product.device_types:
-                notices.append(
-                    _('Desktop support is temporarily disabled '
-                      '(<b data-href="{url}">learn more</b>). '
-                      'Please try this app in Firefox Mobile on your Android '
-                      'phone.').format(url=url))
+                classes.append('incompatible')
+                # notices.append(
+                #     _('Desktop support is temporarily disabled '
+                #       '(<b data-href="{url}">learn more</b>). '
+                #       'Please try this app in Firefox Mobile on your Android '
+                #       'phone.').format(url=url))
             else:
-                notices.append(_('This is a mobile-only app. Please try this '
-                                 'app in Firefox Mobile on your Android '
-                                 'phone.'))
+                classes.append('incompatible')
+                # notices.append(_('This is a mobile-only app. Please try this '
+                #                  'app in Firefox Mobile on your Android '
+                #                  'phone.'))
 
         if need_firefox:
             if request.MOBILE:
-                url = ('https://www.mozilla.org/en-US/mobile/android-download'
-                       '.html')
-                # We can't have nested anchors, so deal with this hack.
-                notices.append(_('To use this app, '
-                                 '<b data-href="{url}">download and install '
-                                 'Firefox for Android</b>.').format(url=url))
-            # TODO: Comment out when we disable installs on desktop again!
-            # else:
-            #    url = 'https://www.mozilla.org/en-US/firefox/'
-            #    notices.append(_('To use this app, <b data-href="{url}">'
-            #                     'download and install '
-            #                     'Firefox</b>.').format(url=url))
+                classes.append('incompatible')
         elif need_upgrade:
-            notices.append(_('To use this app, upgrade Firefox.'))
+            classes.append('incompatible')
 
-        if notices:
+        if notices or 'incompatible' in classes:
             classes += ['bad', 'disabled']
 
         c = dict(request=request, product=product, data_attrs=data_attrs,
@@ -335,10 +326,10 @@ def mkt_breadcrumbs(context, product=None, items=None, crumb_size=40,
 
 @register.function
 def form_field(field, label=None, tag='div', req=None, opt=False, hint=False,
-               some_html=False, cc_startswith=None, cc_for=None,
+               tooltip=False, some_html=False, cc_startswith=None, cc_for=None,
                cc_maxlength=None, grid=False, cls=None, **attrs):
     c = dict(field=field, label=label or field.label, tag=tag, req=req,
-             opt=opt, hint=hint, some_html=some_html,
+             opt=opt, hint=hint, tooltip=tooltip, some_html=some_html,
              cc_startswith=cc_startswith, cc_for=cc_for,
              cc_maxlength=cc_maxlength, grid=grid, cls=cls, attrs=attrs)
     t = env.get_template('site/helpers/simple_field.html').render(**c)

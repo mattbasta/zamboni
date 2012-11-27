@@ -235,6 +235,12 @@ SIGNED_APPS_REVIEWER_PATH = NETAPP_STORAGE + '/signed-apps-reviewer'
 SIGNED_APPS_KEY = ''
 # A seperate signing server for signing packaged apps.
 SIGNED_APPS_SERVER_ACTIVE = False
+# This is the signing REST server for signing apps.
+SIGNED_APPS_SERVER = ''
+# And how long we'll give the server to respond.
+SIGNED_APPS_SERVER_TIMEOUT = 10
+# Send the more terse manifest signatures to the app signing server.
+SIGNED_APPS_OMIT_PER_FILE_SIGS = True
 
 # Absolute path to a writable directory shared by all servers. No trailing
 # slash.
@@ -429,13 +435,6 @@ NOSE_ARGS = [
     '--exclude=mkt/*',
 ]
 
-# If you want to run Selenium tests, you'll need to have a server running.
-# Then give this a dictionary of settings.  Something like:
-#    'HOST': 'localhost',
-#    'PORT': 4444,
-#    'BROWSER': '*firefox', # Alternative: *safari
-SELENIUM_CONFIG = {}
-
 # Tells the extract script what files to look for l10n in and what function
 # handles the extraction.  The Tower library expects this.
 DOMAIN_METHODS = {
@@ -593,7 +592,9 @@ MINIFY_BUNDLES = {
         'zamboni/admin': (
             'css/zamboni/admin-django.css',
             'css/zamboni/admin-mozilla.css',
-            'css/zamboni/admin_features.css'
+            'css/zamboni/admin_features.css',
+            # Datepicker styles and jQuery UI core.
+            'css/zamboni/jquery-ui/custom-1.7.2.css',
         ),
     },
     'js': {
@@ -1323,69 +1324,6 @@ FILE_UNZIP_SIZE_LIMIT = 104857600
 # How long to delay modify updates to cope with alleged NFS slowness.
 MODIFIED_DELAY = 3
 
-# This is a list of dictionaries that we should generate compat info for.
-# app: should match amo.FIREFOX.id.
-# main: the app version we're generating compat info for.
-# versions: version numbers to show in comparisons.
-# previous: the major version before :main.
-COMPAT = (
-    # Firefox.
-    dict(app=1, main='15.0', versions=('15.0', '15.0a2', '15.0a1'),
-         previous='14.0'),
-    dict(app=1, main='14.0', versions=('14.0', '14.0a2', '14.0a1'),
-         previous='13.0'),
-    dict(app=1, main='13.0', versions=('13.0', '13.0a2', '13.0a1'),
-         previous='12.0'),
-    dict(app=1, main='12.0', versions=('12.0', '12.0a2', '12.0a1'),
-         previous='11.0'),
-    dict(app=1, main='11.0', versions=('11.0', '11.0a2', '11.0a1'),
-         previous='10.0'),
-    dict(app=1, main='10.0', versions=('10.0', '10.0a2', '10.0a1'),
-         previous='9.0'),
-    dict(app=1, main='9.0', versions=('9.0', '9.0a2', '9.0a1'),
-         previous='8.0'),
-    dict(app=1, main='8.0', versions=('8.0', '8.0a2', '8.0a1'),
-         previous='7.0'),
-    dict(app=1, main='7.0', versions=('7.0', '7.0a2', '7.0a1'),
-         previous='6.0'),
-    dict(app=1, main='6.0', versions=('6.0', '6.0a2', '6.0a1'),
-         previous='5.0'),
-    dict(app=1, main='5.0', versions=('5.0', '5.0a2', '5.0a1'),
-         previous='4.0'),
-    dict(app=1, main='4.0', versions=('4.0', '4.0a1', '3.7a'),
-         previous='3.6'),
-    # Thunderbird.
-    dict(app=18, main='15.0', versions=('15.0', '15.0a2', '15.0a1'),
-         previous='14.0'),
-    dict(app=18, main='14.0', versions=('14.0', '14.0a2', '14.0a1'),
-         previous='13.0'),
-    dict(app=18, main='13.0', versions=('13.0', '13.0a2', '13.0a1'),
-         previous='12.0'),
-    dict(app=18, main='12.0', versions=('12.0', '12.0a2', '12.0a1'),
-         previous='11.0'),
-    dict(app=18, main='11.0', versions=('11.0', '11.0a2', '11.0a1'),
-         previous='10.0'),
-    dict(app=18, main='10.0', versions=('10.0', '10.0a2', '10.0a1'),
-         previous='9.0'),
-    dict(app=18, main='9.0', versions=('9.0', '9.0a2', '9.0a1'),
-         previous='8.0'),
-    dict(app=18, main='8.0', versions=('8.0', '8.0a2', '8.0a1'),
-         previous='7.0'),
-    dict(app=18, main='7.0', versions=('7.0', '7.0a2', '7.0a1'),
-         previous='6.0'),
-    dict(app=18, main='6.0', versions=('6.0', '6.0a2', '6.0a1'),
-         previous='5.0'),
-    # Seamonkey.
-    dict(app=59, main='2.3', versions=('2.3', '2.3b', '2.3a'),
-         previous='2.2'),
-)
-
-# Latest nightly version of Firefox.
-NIGHTLY_VERSION = COMPAT[0]['main']
-
-# Default minimum version of Firefox/Thunderbird for Add-on Packager.
-DEFAULT_MINVER = COMPAT[4]['main']
-
 # URL for reporting arecibo errors too. If not set, won't be sent.
 ARECIBO_SERVER_URL = ""
 
@@ -1529,16 +1467,15 @@ IN_TEST_SUITE = False
 # Flip this on in your local settings to experience the joy of ES tests.
 RUN_ES_TESTS = False
 
-# The configuration for seclusion the client that speaks to solitude.
-# A tuple of the solitude hosts that seclusion will speak to.
-SECLUSION_HOSTS = ('',)
+# The configuration for the client that speaks to solitude.
+# A tuple of the solitude hosts.
+SOLITUDE_HOSTS = ('',)
 
 # The oAuth key and secret that solitude needs.
-SECLUSION_KEY = ''
-SECLUSION_SECRET = ''
-# The timeout we'll give seclusion. Since this often involves calling Paypal or
-# other servers, we are including that in this.
-SECLUSION_TIMEOUT = 10
+SOLITUDE_KEY = ''
+SOLITUDE_SECRET = ''
+# The timeout we'll give solitude.
+SOLITUDE_TIMEOUT = 10
 
 # Temporary flag to work with navigator.mozPay() on devices that don't
 # support it natively.
@@ -1568,3 +1505,7 @@ WEBTRENDS_PASSWORD = ''
 
 # Domain to allow cross-frame requests from for privacy policy and TOS.
 BROWSERID_DOMAIN= "login.persona.org"
+
+# Adjust these settings to use a custom verifier.
+BROWSERID_VERIFICATION_URL = 'https://verifier.login.persona.org/verify'
+BROWSERID_JS_URL = 'https://login.persona.org/include.js'

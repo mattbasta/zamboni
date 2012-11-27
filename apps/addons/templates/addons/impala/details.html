@@ -94,7 +94,6 @@
 
 {# All this depends on the addon or version, and nothing needs the user,
    so we can cache it all against the addon. #}
-{% cache addon %}
 <section class="primary">
   <div id="addon" class="island c" role="main" data-id="{{ addon.id }}">
     <hgroup>
@@ -241,9 +240,9 @@
   {% endif %}
   <div class="prose">
   {% if addon.description %}
-    <p id="addon-description" class="prose" {{ addon.description|locale_html }}>{{ addon.description|nl2br }}</p>
+    <div id="addon-description" class="prose" {{ addon.description|locale_html }}>{{ addon.description|nl2br }}</div>
   {% else %}
-    <p id="addon-description" class="prose" {{ addon.description|locale_html }}>{{ addon.summary|nl2br }}</p>
+    <div id="addon-description" class="prose" {{ addon.description|locale_html }}>{{ addon.summary|nl2br }}</div>
   {% endif %}
   </div>
 </section>
@@ -314,8 +313,6 @@
 </section>
 
 {% endif %}
-
-{% endcache %} {# cache addon #}
 
 </div>
 {# The rest of the detail page content is in details-more.html.

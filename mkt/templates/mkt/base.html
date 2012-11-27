@@ -5,7 +5,7 @@
 {% set headertitle = headertitle or pagetitle %}
 {% set cache_fragment = cache_fragment or 'cache' %}
 
-{% if request.is_ajax() and not SKIP_FRAGMENT %}
+{% if (request.is_ajax() or FORCE_FRAGMENT) and not SKIP_FRAGMENT %}
   {% extends 'mkt/fragment.html' %}
 {% endif %}
 
@@ -18,6 +18,9 @@
     {% endif %}
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    {% if request.user.is_authenticated() %}
+      <meta name="DCS.dcsaut" content="yes">
+    {% endif %}
     {% block extrameta %}{% endblock %}
     <title>{{ titletag }}</title>
 
@@ -66,6 +69,33 @@
         {% include 'mkt/header.html' %}
       {% endwith %}
     {% endblock %}
+
+    {% if not allow_installs() and not request.GAIA %}
+      <div class="incompatible-browser incompatible-mobile">
+        <div>
+          <a href="http://www.mozilla.org/mobile/aurora/" class="download" target="_blank">
+            {% trans %}
+              You must use Firefox Aurora on your Android phone to install Firefox apps.
+              <b>Learn more</b>
+            {% endtrans %}
+          </a>
+          <a href="#" class="close">&times;</a>
+        </div>
+      </div>
+      {# TODO: Uncomment when we bring back desktop app installation.
+        <div class="incompatible-browser incompatible-desktop">
+          <div>
+            <a href="http://www.mozilla.org/firefox/aurora/" class="download" target="_blank">
+              {% trans %}
+                You must use Firefox Aurora to install Firefox apps.
+                <b>Learn more</b>
+              {% endtrans %}
+            </a>
+            <a href="#" class="close">&times;</a>
+          </div>
+        </div>
+      #}
+    {% endif %}
 
     <div id="container">
       <div id="page" role="main"
@@ -221,7 +251,7 @@
       <script src="{{ static(url('jsi18n'))|urlparams(lang=LANG) }}"></script>
       {# When bug 755694 is solved, expose the shim again. #}
       {# <script src="https://myapps.mozillalabs.com/jsapi/include.js"></script> #}
-      <script async defer src="https://login.persona.org/include.js"></script>
+      <script async defer src="{{ settings.BROWSERID_JS_URL }}"></script>
       {% if not logged %}
         {# We need RECAPTCHA for only non-authenticated users. #}
         <script type="text/javascript" src="{{ settings.RECAPTCHA_AJAX_URL }}"></script>

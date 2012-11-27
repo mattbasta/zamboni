@@ -307,6 +307,10 @@ header {
     }
 }
 
+.device-list {
+    width: 120px;
+}
+
 table.data-grid {
     margin-bottom: 0;
     width: 100%;
@@ -908,6 +912,18 @@ div.editor-stats-table > div.editor-stats-dark {
         display: inline-block;
         margin: 5px 0;
     }
+    .review-actions-tested label {
+        margin: 5px 10px 5px 25px;
+    }
+    .review-actions-device-override {
+        ul {
+            margin-top: 5px;
+            li {
+                display: inline-block;
+                margin-right: 15px;
+            }
+        }
+    }
 }
 
 .review-actions {
@@ -1007,10 +1023,6 @@ div.editor-stats-table > div.editor-stats-dark {
     label {
         font-weight: normal;
     }
-}
-
-#review-actions-form .review-actions-tested label {
-    margin: 5px 10px 5px 25px;
 }
 
 .review-actions-save {
@@ -1176,6 +1188,7 @@ span.currently_viewing_warning {
 
 #manifest-headers,
 #manifest-contents {
+    .border-box;
     color: @dark-gray;
     clear: both;
     font: 12px/14px @mono-stack;
@@ -1183,6 +1196,7 @@ span.currently_viewing_warning {
     margin: 15px 0;
     overflow-x: auto;
     white-space: pre;
+    width: 100%;
 }
 
 #manifest-headers {
@@ -1213,6 +1227,10 @@ span.currently_viewing_warning {
             background: lighten(#def, 4%);
         }
     }
+}
+
+iframe#manifest-contents {
+    min-height: 250px;
 }
 
 @media (max-width: @landscape-max) {

@@ -49,7 +49,8 @@ function gotVerifiedEmail(assertion) {
                     if(!err.msg) {
                         err.msg = gettext("BrowserID login failed. Maybe you don't have an account under that email address?") + " " + textStatus + " " + error;
                     }
-                    alert(err.msg);
+                    var el = $(err.msg);
+                    z.page.trigger('notify', {msg: el.text()});
                 }
                 $.Deferred().reject(err);
             }
@@ -60,7 +61,7 @@ function gotVerifiedEmail(assertion) {
 }
 
 function finishLogin() {
-    var to = z.getVars(window.location.search).to;
+    var to = z.getVars().to;
     $.Deferred().resolve();
     if (to && to[0] == '/') {
         // Browsers may helpfully add "http:" to URIs that begin with double
@@ -71,6 +72,7 @@ function finishLogin() {
         window.location = window.location.protocol + '//'  +
             window.location.host + to;
     } else {
+        console.log('finished login');
         window.location.reload();
     }
 }
@@ -96,6 +98,7 @@ function init_persona() {
         if ($('body').data('user')) {
             email = $('body').data('user').email;
         }
+        console.log('detected user ' + email);
         navigator.id.watch({
             loggedInUser: email,
             onlogin: function(assert) {

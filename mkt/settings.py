@@ -303,6 +303,14 @@ APPCACHE_NET_PATHS = [
     '*'
 ]
 
+APPCACHE_FALLBACK_PATHS = {
+    '/app/': '/offline/home',
+    '/settings/': '/offline/home',
+}
+for url in CARRIER_URLS:
+    APPCACHE_FALLBACK_PATHS['/%s' % url] = '/offline/home';
+
+
 # This callable yields paths relative to MEDIA_ROOT that you want to explicitly
 # cache. The browser will load *all* of these URLs when your app first loads
 # so be mindful to only list essential media files. The actual URL of the path
@@ -346,7 +354,7 @@ def APPCACHE_MEDIA_DEBUG():
         yield path
 
 # Allowed `installs_allowed_from` values for manifest validator.
-VALIDATOR_IAF_URLS = ['https://marketplace.mozilla.org']
+VALIDATOR_IAF_URLS = ['https://marketplace.firefox.com']
 
 # All JS vendor libraries in this list will be excluded from mozmarket.js.
 # For example, if receiptverifier is broken and you need to disable it, add
@@ -406,3 +414,6 @@ APP_PURCHASE_AUD = 'marketplace-dev.allizom.org'
 # It must match that of the pay server that processes nav.mozPay().
 # On B2G this must match a provider in the whitelist.
 APP_PURCHASE_TYP = 'mozilla/payments/pay/v1'
+
+# Allow /developers/?refresh to refresh all MDN content for Developer Hub.
+MDN_LAZY_REFRESH = False

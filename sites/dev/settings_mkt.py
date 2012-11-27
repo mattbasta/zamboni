@@ -91,6 +91,9 @@ WEBAPPS_RECEIPT_URL = private_mkt.WEBAPPS_RECEIPT_URL
 
 APP_PREVIEW = True
 
+# Use HTML5 offline cache?
+USE_APPCACHE = True
+
 WEBAPPS_UNIQUE_BY_DOMAIN = False
 
 #Bug 744268
@@ -110,17 +113,27 @@ INAPP_KEY_PATHS = private_mkt.INAPP_KEY_PATHS
 
 WEBAPP_MANIFEST_NAME = 'Mozilla Marketplace (Dev)'
 
-SECLUSION_HOSTS = ('https://payments-dev.allizom.org',)
+SOLITUDE_HOSTS = ('https://payments-dev.allizom.org',)
 
 PAYPAL_LIMIT_PREAPPROVAL = False
 
-VALIDATOR_IAF_URLS = ['https://marketplace.mozilla.org',
+VALIDATOR_IAF_URLS = ['https://marketplace.firefox.com',
                       'https://marketplace.allizom.org',
                       'https://marketplace-dev.allizom.org']
 
-AMO_LANGUAGES = AMO_LANGUAGES + ('dbg',)
+# Override the limited marketplace ones with these ones from AMO. Because
+# the base gets overridden in the mkt.settings file, we'll set them back again.
+AMO_LANGUAGES = (
+    'af', 'ar', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en-US', 'es', 'eu', 'fa',
+    'fi', 'fr', 'ga-IE', 'he', 'hu', 'id', 'it', 'ja', 'ko', 'mn', 'nl', 'pl',
+    'pt-BR', 'pt-PT', 'ro', 'ru', 'sk', 'sl', 'sq', 'sv-SE', 'uk', 'vi',
+    'zh-CN', 'zh-TW', 'dbg'  # Note the addition of dbg there.
+)
 LANGUAGES = lazy(lazy_langs, dict)(AMO_LANGUAGES)
 LANGUAGE_URL_MAP = dict([(i.lower(), i) for i in AMO_LANGUAGES])
+HIDDEN_LANGUAGES = (
+    'cy', 'sr', 'sr-Latn', 'tr',
+)
 
 BLUEVIA_SECRET = private_mkt.BLUEVIA_SECRET
 
@@ -130,7 +143,8 @@ SIGNING_SERVER_ACTIVE = True
 
 #Bug 793876
 SIGNED_APPS_KEY = private_mkt.SIGNED_APPS_KEY
-SIGNED_APPS_SERVER_ACTIVE = False
+SIGNED_APPS_SERVER_ACTIVE = True
+SIGNED_APPS_SERVER = private_mkt.SIGNED_APPS_SERVER
 
 METLOG_CONF['logger'] = 'addons-marketplace-dev'
 METLOG_CONF['plugins']['raven'] = ('metlog_raven.raven_plugin:config_plugin', {'dsn': private_mkt.SENTRY_DSN})
@@ -138,3 +152,6 @@ METLOG = client_from_dict_config(METLOG_CONF)
 
 WEBTRENDS_USERNAME = private_mkt.WEBTRENDS_USERNAME
 WEBTRENDS_PASSWORD = private_mkt.WEBTRENDS_PASSWORD
+
+# Allow /developers/?refresh to refresh all MDN content for Developer Hub.
+MDN_LAZY_REFRESH = True

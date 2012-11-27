@@ -48,7 +48,7 @@ response_mock.read.return_value = '''
         "icons": {
             "128": "/ballin/icon.png"
         },
-        "installs_allowed_from": [ "https://marketplace.mozilla.org" ]
+        "installs_allowed_from": [ "https://marketplace.firefox.com" ]
     }
 '''
 response_mock.headers = {'Content-Type':
@@ -208,7 +208,10 @@ class TestEditBasic(TestEdit):
         eq_(webapp.slug, self.webapp.slug)
         eq_(webapp.app_slug, self.webapp.app_slug)
 
-    def test_view_manifest_url_default(self):
+    @mock.patch('devhub.tasks.urllib2.urlopen')
+    def test_view_manifest_url_default(self, mock_urlopen):
+        mock_urlopen.return_value = response_mock
+
         # Should be able to see manifest URL listed.
         r = self.client.get(self.url)
         eq_(pq(r.content)('#manifest-url a').attr('href'),

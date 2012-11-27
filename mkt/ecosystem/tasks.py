@@ -68,21 +68,6 @@ tutorials = [
         'mdn': 'https://developer.mozilla.org/%(locale)s/docs/Mozilla/Boot_to_Gecko?raw=1&macros=true'
     },
     {
-        'title': 'General',
-        'name': 'tutorial_general',
-        'mdn': 'https://developer.mozilla.org/%(locale)s/docs/Apps/Tutorials/General?raw=1&macros=true'
-    },
-    {
-        'title': 'App Templates Tutorial',
-        'name': 'tutorial_weather',
-        'mdn': 'https://developer.mozilla.org/%(locale)s/docs/Apps/Tutorials/Weather_app_tutorial?raw=1&macros=true'
-    },
-    {
-        'title': 'Serpent Game',
-        'name': 'tutorial_serpent',
-        'mdn': 'https://developer.mozilla.org/%(locale)s/docs/Apps/Tutorials/Games/Serpent_game?raw=1&macros=true'
-    },
-    {
         'title': 'Marketplace Submission',
         'name': 'mkt_submission',
         'mdn': 'https://developer.mozilla.org/%(locale)s/docs/Apps/Submitting_an_app?raw=1&macros=true'
@@ -142,7 +127,7 @@ locales = ['en-US']
 
 
 @task
-def refresh_mdn_cache():
+def refresh_mdn_cache(**kw):
     log.info('Refreshing MDN Cache')
     try:
         _update_mdn_items(tutorials)
@@ -198,7 +183,11 @@ def _fetch_mdn_page(url):
     if anchors:
         # We only want anchors that have an href attribute available.
         external_links = anchors.filter(lambda i: pq(this).attr('href'))
-        external_links.each(lambda e: e.attr('target', '_blank'))
+        for link in external_links:
+            link = pq(link)
+            if link.hasClass('external') or link.attr('rel') == 'external':
+                link.attr('target', '_blank')
+                link.attr('rel', 'external')
         # PyQuery doesn't like the idea of filtering like
         # external_links.filter('a[href^="/"'), so we'll just do as they
         # suggest for now.

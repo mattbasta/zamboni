@@ -34,6 +34,24 @@ class TestLanding(amo.tests.TestCase):
         eq_(r.status_code, 200)
         self.assertTemplateUsed(r, 'ecosystem/landing.html')
 
+    @mock.patch.object(settings, 'MDN_LAZY_REFRESH', True)
+    @mock.patch('mkt.ecosystem.views.refresh_mdn_cache')
+    def test_tutorials_refresh(self, mock_):
+        r = self.client.get(self.url)
+        assert not mock_.called
+
+        r = self.client.get(self.url, {'refresh': '1'})
+        assert mock_.called
+
+    @mock.patch.object(settings, 'MDN_LAZY_REFRESH', False)
+    @mock.patch('mkt.ecosystem.views.refresh_mdn_cache')
+    def test_tutorials_refresh_disabled(self, mock_):
+        r = self.client.get(self.url)
+        assert not mock_.called
+
+        r = self.client.get(self.url, {'refresh': '1'})
+        assert not mock_.called
+
 
 class TestDevHub(amo.tests.TestCase):
 
@@ -46,6 +64,12 @@ class TestDevHub(amo.tests.TestCase):
         r = self.client.get(reverse('ecosystem.installation'))
         eq_(r.status_code, 200)
         self.assertTemplateUsed(r, 'ecosystem/installation.html')
+
+    def test_reference_app(self):
+        r = self.client.get(reverse('ecosystem.apps_documentation',
+                            args=['face_value']))
+        eq_(r.status_code, 200)
+        self.assertTemplateUsed(r, 'ecosystem/reference_apps/face_value.html')
 
 
 class TestMdnDocumentation(amo.tests.TestCase):

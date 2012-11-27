@@ -100,11 +100,11 @@ WAFFLE_SUFFIX = WAFFLE_TABLE_SUFFIX = 'mkt'
 SENTRY_DSN = private_mkt.SENTRY_DSN
 
 METRICS_SERVER = 'https://data.mozilla.com/'
-VALIDATOR_IAF_URLS = ['https://marketplace.mozilla.org',
+VALIDATOR_IAF_URLS = ['https://marketplace.firefox.com',
                       'https://marketplace.allizom.org',
                       'https://marketplace-dev.allizom.org']
 
-SECLUSION_HOSTS = ('https://payments.allizom.org',)
+SOLITUDE_HOSTS = ('https://payments.allizom.org',)
 
 GEOIP_NOOP = 0
 

@@ -22,7 +22,7 @@ import amo
 from abuse.models import AbuseReport
 from access import acl
 from addons.decorators import addon_view
-from addons.models import Persona, Version
+from addons.models import AddonDeviceType, Persona, Version
 from amo import messages
 from amo.decorators import json_view, permission_required, post_required
 from amo.helpers import absolutify
@@ -174,26 +174,51 @@ def _review(request, addon):
     is_admin = acl.action_allowed(request, 'Addons', 'Edit')
 
     if request.method == 'POST' and form.is_valid():
+
+        old_types = set(o.id for o in addon.device_types)
+        new_types = set(form.cleaned_data.get('device_override'))
+
+        if (form.cleaned_data.get('action') == 'public' and
+            old_types != new_types):
+
+            # The reviewer overrode the device types. We need to not publish
+            # this app immediately.
+            if addon.make_public == amo.PUBLIC_IMMEDIATELY:
+                addon.update(make_public=amo.PUBLIC_WAIT)
+
+            # And update the device types to what the reviewer set.
+            AddonDeviceType.objects.filter(addon=addon).delete()
+            for device in form.cleaned_data.get('device_override'):
+                addon.addondevicetype_set.create(device_type=device)
+
+            # Log that the reviewer changed the device types.
+            added_devices = new_types - old_types
+            removed_devices = old_types - new_types
+            msg = _(u'Device(s) changed by reviewer: {0}').format(', '.join(
+                [_(u'Added {0}').format(unicode(amo.DEVICE_TYPES[d].name))
+                 for d in added_devices] +
+                [_(u'Removed {0}').format(unicode(amo.DEVICE_TYPES[d].name))
+                 for d in removed_devices]))
+            amo.log(amo.LOG.REVIEW_DEVICE_OVERRIDE, addon,
+                    addon.current_version, details={'comments': msg})
+
         form.helper.process()
+
         if form.cleaned_data.get('notify'):
             EditorSubscription.objects.get_or_create(user=request.amo_user,
                                                      addon=addon)
-        if form.cleaned_data.get('adminflag') and is_admin:
-            addon.update(admin_review=False)
+
         messages.success(request, _('Review successfully processed.'))
         return redirect(redirect_url)
 
     canned = AppCannedResponse.objects.all()
     actions = form.helper.actions.items()
 
-    statuses = [amo.STATUS_PUBLIC, amo.STATUS_LITE,
-                amo.STATUS_LITE_AND_NOMINATED]
-
     try:
         show_diff = (addon.versions.exclude(id=version.id)
                                    .filter(files__isnull=False,
                                            created__lt=version.created,
-                                           files__status__in=statuses)
+                                           files__status=amo.STATUS_PUBLIC)
                                    .latest())
     except Version.DoesNotExist:
         show_diff = None
@@ -205,7 +230,6 @@ def _review(request, addon):
     allow_unchecking_files = form.helper.review_type == "pending"
 
     versions = (Version.objects.filter(addon=addon)
-                               .exclude(files__status=amo.STATUS_BETA)
                                .order_by('-created')
                                .transform(Version.transformer_activity)
                                .transform(Version.transformer))
@@ -384,14 +408,15 @@ def app_view_manifest(request, addon):
         version = addon.versions.latest()
         content = json.dumps(json.loads(_mini_manifest(addon, version.id)),
                              indent=4)
-        return escape_all({'content': content, 'headers': ''})
+        return escape_all({'content': content, 'headers': '', 'success': True})
 
     else:  # Show the hosted manifest_url.
-        content, headers = u'', {}
+        content, headers, success = u'', {}, False
         if addon.manifest_url:
             try:
                 req = requests.get(addon.manifest_url, verify=False)
                 content, headers = req.content, req.headers
+                success = True
             except Exception:
                 content = u''.join(traceback.format_exception(*sys.exc_info()))
 
@@ -402,7 +427,8 @@ def app_view_manifest(request, addon):
                 # If it's not valid JSON, just return the content as is.
                 pass
         return escape_all({'content': smart_decode(content),
-                           'headers': headers})
+                           'headers': headers,
+                           'success': success})
 
 
 @permission_required('Apps', 'Review')
