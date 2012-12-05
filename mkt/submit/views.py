@@ -15,6 +15,7 @@ from addons.models import Addon, AddonUser
 from files.models import Platform
 from users.models import UserProfile
 
+from mkt.constants import DEVICE_LOOKUP
 from mkt.developers import tasks
 from mkt.developers.decorators import dev_required
 from mkt.developers.forms import AppFormMedia, CategoryForm, PreviewFormSet
@@ -116,7 +117,8 @@ def manifest(request):
 
     return jingo.render(request, 'submit/manifest.html', {
         'step': 'manifest',
-        'form': form
+        'form': form,
+        'DEVICE_LOOKUP': DEVICE_LOOKUP
     })
 
 

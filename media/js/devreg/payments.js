@@ -248,6 +248,10 @@ exports.check_with_paypal = function() {
     }
 };
 
+$('.update-payment-type input[type=submit]').on('click', function(e) {
+    $('input[name=toggle-paid]').val($(this).data('type'));
+});
+
 
 })(typeof exports === 'undefined' ? (this.dev_paypal = {}) : exports);
 
