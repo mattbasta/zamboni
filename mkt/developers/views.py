@@ -22,7 +22,6 @@ from waffle.decorators import waffle_switch
 
 import amo
 import amo.utils
-import paypal
 from access import acl
 from addons import forms as addon_forms
 from addons.decorators import can_become_premium

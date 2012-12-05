@@ -30,27 +30,6 @@ from . import forms
 paypal_log = commonware.log.getLogger('z.paypal')
 
 
-@dev_required(webapp=True)
-@can_become_premium
-def marketplace_paypal(request, addon_id, addon, webapp=False):
-    """
-    Start of the marketplace wizard, none of this means anything until
-    addon-premium is set, so we'll just save as we go along. Further
-    we might have the PayPal permissions bounce happen at any time
-    so we'll need to cope with AddonPremium being incomplete.
-    """
-    form = forms.PremiumForm(
-        request.POST or None, request=request,
-        extra={'addon': addon, 'amo_user': request.amo_user,
-               'dest': 'wizard', 'exclude': ['price']})
-    if form.is_valid():
-        form.save()
-        return redirect(addon.get_dev_url('market.2'))
-
-    return jingo.render(request, 'developers/payments/paypal.html',
-                        {'form': form, 'addon': addon, 'webapp': webapp,
-                         'premium': addon.premium})
-
 @json_view
 @dev_required(owner_for_post=True, webapp=True)
 def paypal_setup(request, addon_id, addon, webapp):
