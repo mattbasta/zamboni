@@ -31,6 +31,8 @@ def paypal_patterns(prefix):
 
 def payments_patterns(prefix):
     return patterns('',
+        url('^$', views.payments, name='mkt.developers.apps.payments'),
+
         url('^payment_accounts$', views.payments_accounts,
             name='mkt.developers.%s.payment_accounts' % prefix),
 
@@ -62,12 +64,11 @@ app_detail_patterns = patterns('',
     url('^versions/delete$', views.version_delete,
         name='mkt.developers.apps.versions.delete'),
 
-    url('^payments$', views.payments, name='mkt.developers.apps.payments'),
-    # PayPal-specific stuff.
-    url('^paypal/', include(paypal_patterns('apps'))),
-
     # Payments-specific stuff.
     url('^payments/', include(payments_patterns('payments'))),
+
+    # PayPal-specific stuff.
+    url('^paypal/', include(paypal_patterns('apps'))),
 
     # Bluevia-specific stuff.
     url('^bluevia$', views.get_bluevia_url,

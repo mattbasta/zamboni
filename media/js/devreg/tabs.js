@@ -42,6 +42,8 @@
                 }
                 $this.find('.tab').removeClass('active');
                 $this.find('.tab:eq(' + i + ')').addClass('active');
+
+                $this.trigger('tabs-changed', $tab[0]);
             }));
         });
 

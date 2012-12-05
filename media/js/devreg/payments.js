@@ -248,9 +248,14 @@ exports.check_with_paypal = function() {
     }
 };
 
-$('.update-payment-type input[type=submit]').on('click', function(e) {
+$('.update-payment-type button').click(function(e) {
     $('input[name=toggle-paid]').val($(this).data('type'));
 });
+
+var $paid_island = $('#paid-island, #paid-upsell-island');
+$('#submit-payment-type.hasappendix').on('tabs-changed', function(e, tab) {
+    $paid_island.toggle(tab.id == 'paid-tab-header');
+})
 
 
 })(typeof exports === 'undefined' ? (this.dev_paypal = {}) : exports);

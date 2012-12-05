@@ -1,7 +1,12 @@
+from django.shortcuts import redirect
+
 import jingo
+from tower import ugettext as _
 
 import amo
+from amo import messages
 from amo.decorators import json_view, post_required, write
+from lib.pay_server import client
 
 from mkt.constants import DEVICE_LOOKUP
 from mkt.developers.decorators import dev_required
@@ -16,6 +21,8 @@ def payments(request, addon_id, addon, webapp=False):
         request.POST or None, request=request,
         extra={'addon': addon, 'amo_user': request.amo_user,
                'dest': 'payment'})
+    upsell_form = forms.UpsellForm(
+        request.POST or None, request=request, addon=addon)
 
     if request.method == 'POST' and premium_form.is_valid():
         premium_form.save()
@@ -32,7 +39,8 @@ def payments(request, addon_id, addon, webapp=False):
     return jingo.render(
         request, 'developers/payments/premium.html',
         {'addon': addon, 'webapp': webapp, 'premium': addon.premium,
-         'form': premium_form, 'DEVICE_LOOKUP': DEVICE_LOOKUP,
+         'form': premium_form, 'upsell_form': upsell_form,
+         'DEVICE_LOOKUP': DEVICE_LOOKUP,
          'is_paid': addon.premium_type == amo.ADDON_PREMIUM,
          'no_paid': cannot_be_paid})
 
@@ -47,7 +55,6 @@ def payments_accounts(request):
 @json_view
 @post_required
 def payments_accounts_add(request):
-
     return {'success': True}
 
 

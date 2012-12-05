@@ -21,22 +21,43 @@ log = commonware.log.getLogger('z.devhub')
 paypal_log = commonware.log.getLogger('mkt.paypal')
 
 
+PREMIUM_STATUSES = [
+    amo.ADDON_FREE,
+    amo.ADDON_PREMIUM
+]
+PREMIUM_CHOICES = dict((k, v) for k, v in amo.ADDON_PREMIUM_TYPES.items() if
+                       k in PREMIUM_STATUSES)
+# A mapping of (PREMIUM_TYPE, <Allow in-app payments>)
+PREMIUM_MAPPING = {
+    (amo.ADDON_FREE, False): amo.ADDON_FREE,
+    (amo.ADDON_FREE, True): amo.ADDON_FREE_INAPP,
+    (amo.ADDON_PREMIUM, False): amo.ADDON_PREMIUM,
+    (amo.ADDON_PREMIUM, True): amo.ADDON_PREMIUM_INAPP,
+}
+
+PREMIUM_REVERSE_MAPPING = {
+    amo.ADDON_FREE: amo.ADDON_FREE,
+    amo.ADDON_PREMIUM: amo.ADDON_PREMIUM,
+    amo.ADDON_PREMIUM_INAPP: amo.ADDON_PREMIUM,
+    amo.ADDON_FREE_INAPP: amo.ADDON_FREE,
+    amo.ADDON_OTHER_INAPP: amo.ADDON_FREE
+}
+
+
 class PremiumForm(happyforms.Form):
     """
     The premium details for an addon, which is unfortunately
     distributed across a few models.
     """
 
-    #premium_type = forms.TypedChoiceField(label=_lazy(u'Premium Type'),
-    #    coerce=lambda x: int(x), choices=amo.ADDON_PREMIUM_TYPES.items(),
-    #    widget=forms.RadioSelect())
+    premium_type = forms.TypedChoiceField(
+        label=_lazy(u'Premium Type'), widget=forms.Select(), required=False,
+        coerce=lambda x: int(x), choices=PREMIUM_CHOICES.items())
+    allow_inapp = forms.BooleanField(
+        label=_lazy(u'Allow In-App Purchases?'), required=False)
     #price = forms.ModelChoiceField(queryset=Price.objects.active(),
     #                               label=_lazy(u'App Price'),
-    #                               empty_label=None,
-    #                               required=False)
-    #free = AddonChoiceField(queryset=Addon.objects.none(), required=False,
-    #                        label=_lazy(u'This is a paid upgrade of'),
-    #                        empty_label=_lazy(u'Not an upgrade'))
+    #                               empty_label=None, required=False)
     #currencies = forms.MultipleChoiceField(
     #    widget=forms.CheckboxSelectMultiple,
     #    required=False, label=_lazy(u'Supported Non-USD Currencies'))
@@ -58,7 +79,10 @@ class PremiumForm(happyforms.Form):
         self.request = kw.pop('request')
         self.addon = self.extra['addon']
 
-        kw['initial'] = {'premium_type': self.addon.premium_type}
+        kw['initial'] = {
+            'premium_type': PREMIUM_REVERSE_MAPPING[self.addon.premium_type],
+            'allow_inapp': self.addon.premium_type in amo.ADDON_INAPPS
+        }
         if self.addon.premium:
             kw['initial']['price'] = self.addon.premium.price
 
@@ -80,20 +104,16 @@ class PremiumForm(happyforms.Form):
         #    self.fields['currencies'].choices = [(k, k)
         #                                         for k in choices if k]
 
-        self.fields['free'].queryset = (self.extra['amo_user'].addons
-            .exclude(pk=self.addon.pk)
-            .filter(premium_type__in=amo.ADDON_FREES,
-                    status__in=amo.VALID_STATUSES,
-                    type=self.addon.type))
-        if (not self.initial.get('price') and
-            len(list(self.fields['price'].choices)) > 1):
-            # Tier 0 (Free) should not be the default selection.
-            self.initial['price'] = (Price.objects.active()
-                                     .exclude(price='0.00')[0])
+        #if (not self.initial.get('price') and
+        #    len(list(self.fields['price'].choices)) > 1):
+        #    # Tier 0 (Free) should not be the default selection.
+        #    self.initial['price'] = (Price.objects.active()
+        #                             .exclude(price='0.00')[0])
 
         # For the wizard, we need to remove some fields.
         for field in self.extra.get('exclude', []):
-            del self.fields[field]
+            if field in self.fields:
+                del self.fields[field]
 
     def clean_price(self):
         if (self.cleaned_data.get('premium_type') in amo.ADDON_PREMIUMS
@@ -101,48 +121,48 @@ class PremiumForm(happyforms.Form):
             raise_required()
         return self.cleaned_data['price']
 
-    def clean_free(self):
-        return self.cleaned_data['free']
-
     def save(self):
-        if self.request.POST
-        if 'price' in self.cleaned_data:
+        toggle = self.request.POST.get('toggle-paid')
+        upsell = self.addon.upsold
+
+        if toggle == 'paid' and self.addon.premium_type == amo.ADDON_FREE:
+            # Toggle free apps to paid by giving them a premium object.
             premium = self.addon.premium
             if not premium:
                 premium = AddonPremium()
                 premium.addon = self.addon
-            premium.price = self.cleaned_data['price']
+            premium.price = Price.objects.get(price='0.00')
             premium.save()
 
-        upsell = self.addon.upsold
-        if self.cleaned_data['free']:
+            self.addon.premium_type = amo.ADDON_PREMIUM
 
-            # Check if this app was already a premium version for another app.
-            if upsell and upsell.free != self.cleaned_data['free']:
+            # Free -> Paid for public apps brings a re-review.
+            if self.addon.status == amo.STATUS_PUBLIC:
+                log.info(u'[Webapp:%s] (Re-review) Public app, free -> paid.' %
+                             self.addon)
+
+                RereviewQueue.flag(self.addon, amo.LOG.REREVIEW_FREE_TO_PAID)
+
+        elif (toggle == 'free' and
+              self.addon.premium_type in amo.ADDON_PREMIUMS):
+            # If the app is paid and we're making it free, remove it as an
+            # upsell (if an upsell exists).
+            upsell = self.addon.upsold
+            if upsell:
                 upsell.delete()
 
-            if not upsell:
-                upsell = AddonUpsell(premium=self.addon)
-            upsell.free = self.cleaned_data['free']
-            upsell.save()
-        elif not self.cleaned_data['free'] and upsell:
-            upsell.delete()
+            self.addon.premium_type = amo.ADDON_FREE
 
-        # Check for free -> paid for already public apps.
-        premium_type = self.cleaned_data['premium_type']
-        if (self.addon.premium_type == amo.ADDON_FREE and
-            premium_type in amo.ADDON_PREMIUMS and
-            self.addon.status == amo.STATUS_PUBLIC):
-            # Free -> paid for public apps trigger re-review.
-            log.info(u'[Webapp:%s] (Re-review) Public app, free -> paid.' % (
-                self.addon))
-            RereviewQueue.flag(self.addon, amo.LOG.REREVIEW_FREE_TO_PAID)
+        elif self.addon.premium_type in amo.ADDON_PREMIUMS:
+            # The dev is submitting updates for payment data about a paid app.
 
-        self.addon.premium_type = premium_type
+            premium_type = self.cleaned_data.get('premium_type')
+            allow_inapp = self.cleaned_data.get('allow_inapp')
+            self.addon.premium_type = PREMIUM_MAPPING[premium_type, allow_inapp]
 
-        if self.addon.premium and waffle.switch_is_active('currencies'):
-            currencies = self.cleaned_data['currencies']
-            self.addon.premium.update(currencies=currencies)
+        #if self.addon.premium and waffle.switch_is_active('currencies'):
+        #    currencies = self.cleaned_data['currencies']
+        #    self.addon.premium.update(currencies=currencies)
 
         self.addon.save()
 
@@ -150,6 +170,52 @@ class PremiumForm(happyforms.Form):
         # to keep it free, push to pending.
         if not self.addon.needs_paypal() and self.addon.is_incomplete():
             self.addon.mark_done()
+
+
+class UpsellForm(happyforms.Form):
+
+    upsell_of = AddonChoiceField(queryset=Addon.objects.none(), required=False,
+                                 label=_lazy(u'This is a paid upgrade of'),
+                                 empty_label=_lazy(u'Not an upgrade'))
+
+    def __init__(self, *args, **kw):
+        self.request = kw.pop('request')
+        self.addon = kw.pop('addon')
+
+        super(UpsellForm, self).__init__(*args, **kw)
+
+        self.fields['upsell_of'].queryset = (self.request.amo_user.addons
+            .exclude(pk=self.addon.pk)
+            .filter(premium_type__in=amo.ADDON_FREES,
+                    status__in=amo.VALID_STATUSES,
+                    type=self.addon.type))
+
+    def clean_upsell_of(self):
+        return self.cleaned_data['upsell_of']
+
+    def save(self):
+        current_upsell = self.addon.upsold
+        new_upsell_app = self.cleaned_data['upsell_of']
+
+        if new_upsell_app:
+            # We're changing the upsell or creating a new one.
+
+            if current_upsell and current_upsell.free != new_upsell_app:
+                # The upsell is changing.
+                current_upsell.delete()
+
+            if not current_upsell:
+                # If the upsell is new or we just deleted the old upsell,
+                # create a new upsell.
+                current_upsell = AddonUpsell(premium=self.addon)
+
+            # Set the upsell object to point to the app that we're upselling.
+            current_upsell.free = new_upsell_app
+            current_upsell.save()
+
+        if not new_upsell_app and current_upsell:
+            # We're deleting the upsell.
+            current_upsell.delete()
 
 
 class InappConfigForm(happyforms.ModelForm):
@@ -257,15 +323,16 @@ class BankDetailsForm(happyforms.Form):
 
     def __init__(self, package, act_type='bango', *args, **kwargs):
         self.package = package
+        self.act_type = act_type
         super(BankDetailsForm, self).__init__(*args, **kwargs)
 
     def clean(self):
         data = self.cleaned_data
         return {
-            'seller_bango': self.package,  # Bango package URL
-            'bankAccountPayeeName': 'Andy',
-            'bankAccountNumber': 'Yes',
-            'bankAccountCode': '123',
+            'seller_%s' % self.act_type: self.package,  # Seller package info.
+            'bankAccountPayeeName': data['holder_name'],
+            'bankAccountNumber': data['account_number'],
+            'bankAccountCode': data[''],
             'bankName': 'Bailouts r us',
             'bankAddress1': '123 Yonge St',
             'bankAddressZipCode': 'V1V 1V1',
