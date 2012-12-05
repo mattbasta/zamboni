@@ -29,6 +29,19 @@ def paypal_patterns(prefix):
     )
 
 
+def payments_patterns(prefix):
+    return patterns('',
+        url('^payment_accounts$', views.payments_accounts,
+            name='mkt.developers.%s.payment_accounts' % prefix),
+
+        url('^payment_accounts/add$', views.payments_accounts_add,
+            name='mkt.developers.%s.add_payment_account' % prefix),
+
+        url('^payment_accounts/(?P<id>\d+)$', views.payments_accounts_account,
+            name='mkt.developers.%s.payment_account' % prefix),
+    )
+
+
 # These will all start with /app/<app_slug>/
 app_detail_patterns = patterns('',
     url('^edit$', views.edit, name='mkt.developers.apps.edit'),
@@ -52,6 +65,9 @@ app_detail_patterns = patterns('',
     url('^payments$', views.payments, name='mkt.developers.apps.payments'),
     # PayPal-specific stuff.
     url('^paypal/', include(paypal_patterns('apps'))),
+
+    # Payments-specific stuff.
+    url('^payments/', include(payments_patterns('payments'))),
 
     # Bluevia-specific stuff.
     url('^bluevia$', views.get_bluevia_url,
