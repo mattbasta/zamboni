@@ -38,9 +38,7 @@
     <ul class="refinements">
       {% for url, title in urls %}
         {# Hook up PayPal urls under payment urls #}
-        <li{% if request.path.startswith(url)
-              or (request.path.startswith(addon.get_dev_url('paypal_setup'))
-                  and url == addon.get_dev_url('payments')) %} class="selected"{% endif %}>
+        <li{% if request.path.startswith(url) %} class="selected"{% endif %}>
           <a href="{{ url }}">{{ title }}</a></li>
       {% endfor %}
     </ul>

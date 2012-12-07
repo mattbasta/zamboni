@@ -51,6 +51,9 @@ mapping = {
     'personal_basic': ['paypal', 'personal-basic', ['post']],
     'personal_advanced': ['paypal', 'personal-advanced', ['post']],
     'refund': ['paypal', 'refund', ['post']],
+    # Bango APIs
+    'package': ['bango', 'package', ['get', 'post']],
+    'bank_details': ['bango', 'bank', ['post']],
 }
 
 

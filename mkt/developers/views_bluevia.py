@@ -7,9 +7,11 @@ from django.db import transaction
 import commonware.log
 import jingo
 import jwt
+from tower import ugettext as _
 
 from amo.decorators import json_view, post_required, write
 
+from mkt.constants import regions
 from mkt.developers.decorators import dev_required
 from mkt.developers.models import AddonBlueViaConfig, BlueViaConfig
 

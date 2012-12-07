@@ -45,7 +45,7 @@ from users.views import _login
 from versions.models import Version
 
 from mkt.api.models import Access, generate
-from mkt.constants import APP_IMAGE_SIZES, regions
+from mkt.constants import APP_IMAGE_SIZES
 from mkt.developers.decorators import dev_required
 from mkt.developers.forms import (AppFormBasic, AppFormDetails, AppFormMedia,
                                   AppFormSupport, AppFormTechnical,
@@ -313,7 +313,7 @@ def in_app_config(request, addon_id, addon, webapp=True):
     try:
         inapp_config = InappConfig.objects.get(addon=addon,
                                                status=amo.INAPP_STATUS_ACTIVE)
-    except models.ObjectDoesNotExist:
+    except InappConfig.DoesNotExist:
         inapp_config = None
 
     inapp_form = InappConfigForm(request.POST or None,

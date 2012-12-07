@@ -29,18 +29,16 @@ def paypal_patterns(prefix):
     )
 
 
-def payments_patterns(prefix):
+def bango_patterns(prefix):
     return patterns('',
-        url('^$', views.payments, name='mkt.developers.apps.payments'),
-
-        url('^payment_accounts$', views.payments_accounts,
+        url('^accounts$', views.payments_accounts,
             name='mkt.developers.%s.payment_accounts' % prefix),
 
-        url('^payment_accounts/add$', views.payments_accounts_add,
+        url('^accounts/add$', views.payments_accounts_add,
             name='mkt.developers.%s.add_payment_account' % prefix),
 
-        url('^payment_accounts/(?P<id>\d+)$', views.payments_accounts_account,
-            name='mkt.developers.%s.payment_account' % prefix),
+        url('^accounts/(?P<id>\d+)/delete$', views.payments_accounts_delete,
+            name='mkt.developers.%s.delete_payment_account' % prefix),
     )
 
 
@@ -64,8 +62,7 @@ app_detail_patterns = patterns('',
     url('^versions/delete$', views.version_delete,
         name='mkt.developers.apps.versions.delete'),
 
-    # Payments-specific stuff.
-    url('^payments/', include(payments_patterns('payments'))),
+    url('^payments/$', views.payments, name='mkt.developers.apps.payments'),
 
     # PayPal-specific stuff.
     url('^paypal/', include(paypal_patterns('apps'))),
@@ -165,4 +162,7 @@ urlpatterns = decorate(write, patterns('',
         views.docs, name='mkt.developers.docs'),
     url('docs/(?P<doc_name>[-_\w]+)/(?P<doc_page>[-_\w]+)',
         views.docs, name='mkt.developers.docs'),
+
+    # Bango-specific stuff.
+    url('^bango/', include(bango_patterns('bango'))),
 ))

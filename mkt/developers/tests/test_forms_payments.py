@@ -1,6 +1,7 @@
 from django.conf import settings
 
 import mock
+from nose.tools import eq_
 from test_utils import RequestFactory
 
 import amo
@@ -38,42 +39,27 @@ class TestFreeToPremium(amo.tests.TestCase):
         self.price = Price.objects.create(price='0.99')
         self.user = UserProfile.objects.get(email='steamcube@mozilla.com')
 
-    def test_free_to_premium(self):
-        kwargs = {
+        self.kwargs = {
             'request': self.request,
-            'extra': {
-                'addon': self.addon,
-                'amo_user': self.user,
-                'dest': 'payment',
-            }
+            'addon': self.addon,
+            'user': self.user,
         }
-        data = {
-            'premium_type': amo.ADDON_PREMIUM,
-            'price': self.price.id,
-        }
-        form = forms.PremiumForm(data=data, **kwargs)
-        assert form.is_valid()
+
+    def test_free_to_premium(self):
+        self.request.POST = {'toggle-paid': 'paid'}
+        form = forms.PremiumForm(data={}, **self.kwargs)
+        assert form.is_valid(), form.errors
         form.save()
-        eq_(RereviewQueue.objects.count(), 1)
+        eq_(self.addon.premium_type, amo.ADDON_PREMIUM)
+        eq_(self.addon.status, amo.STATUS_NULL)
 
     def test_free_to_premium_pending(self):
         # Pending apps shouldn't get re-reviewed.
         self.addon.update(status=amo.STATUS_PENDING)
 
-        kwargs = {
-            'request': self.request,
-            'extra': {
-                'addon': self.addon,
-                'amo_user': self.user,
-                'dest': 'payment',
-            }
-        }
-        data = {
-            'premium_type': amo.ADDON_PREMIUM,
-            'price': self.price.id,
-        }
-        form = forms.PremiumForm(data=data, **kwargs)
-        assert form.is_valid()
+        self.request.POST = {'toggle-paid': 'paid'}
+        form = forms.PremiumForm(data={}, **self.kwargs)
+        assert form.is_valid(), form.errors
         form.save()
         eq_(RereviewQueue.objects.count(), 0)
 
@@ -81,19 +67,14 @@ class TestFreeToPremium(amo.tests.TestCase):
         # Premium to Free is ok for public apps.
         self.make_premium(self.addon)
 
-        kwargs = {
-            'request': self.request,
-            'extra': {
-                'addon': self.addon,
-                'amo_user': self.user,
-                'dest': 'payment',
-            }
-        }
-        data = {'premium_type': amo.ADDON_FREE}
-        form = forms.PremiumForm(data=data, **kwargs)
-        assert form.is_valid()
+        self.request.POST = {'toggle-paid': 'free'}
+        data = {'price': self.price.pk}
+        form = forms.PremiumForm(data=data, **self.kwargs)
+        assert form.is_valid(), form.errors
         form.save()
         eq_(RereviewQueue.objects.count(), 0)
+        eq_(self.addon.premium_type, amo.ADDON_FREE)
+        eq_(self.addon.status, amo.STATUS_PUBLIC)
 
 
 class TestInappConfigForm(amo.tests.TestCase):
