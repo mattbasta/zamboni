@@ -15,21 +15,6 @@ from users.models import UserProfile
 from mkt.developers import forms
 
 
-class TestPaypalSetupForm(amo.tests.TestCase):
-
-    def test_email_required(self):
-        data = {'email': ''}
-        assert not forms.PaypalSetupForm(data=data).is_valid()
-
-    def test_email_gotten(self):
-        data = {'email': 'foo@bar.com'}
-        assert forms.PaypalSetupForm(data=data).is_valid()
-
-    def test_email_malformed(self):
-        data = {'email': 'foo'}
-        assert not forms.PaypalSetupForm(data=data).is_valid()
-
-
 class TestFreeToPremium(amo.tests.TestCase):
     fixtures = ['webapps/337141-steamcube']
 
