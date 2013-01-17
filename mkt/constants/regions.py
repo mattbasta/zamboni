@@ -48,6 +48,7 @@ class WORLDWIDE(REGION):
     name = _lazy(u'Worldwide')
     slug = 'worldwide'
     weight = -1
+    has_payments = False
 
 
 class US(REGION):
@@ -56,6 +57,7 @@ class US(REGION):
     slug = 'us'
     mcc = 310
     weight = 1
+    has_payments = False
 
 
 class UK(REGION):
@@ -64,6 +66,7 @@ class UK(REGION):
     slug = 'uk'
     default_currency = 'GBP'
     mcc = 235
+    has_payments = False
 
 
 class BR(REGION):
@@ -74,6 +77,7 @@ class BR(REGION):
     default_language = 'pt-BR'
     mcc = 724
     ratingsbodies = (ratingsbodies.DJCTQ,)
+    has_payments = True
 
 
 # Create a list of tuples like so (in alphabetical order):
@@ -103,7 +107,9 @@ REGIONS_CHOICES_NAME = ([(WORLDWIDE.id, WORLDWIDE.name)] +
 REGIONS_DICT = dict(REGIONS_CHOICES)
 REGIONS_CHOICES_ID_DICT = dict(REGIONS_CHOICES_ID)
 
-ALL_REGIONS = REGIONS_DICT.values()
+ALL_REGIONS = frozenset(REGIONS_DICT.values())
+ALL_PAID_REGIONS = frozenset(r for r in ALL_REGIONS if r.has_payments)
 
 ALL_REGION_IDS = sorted(REGIONS_CHOICES_ID_DICT.keys())
+ALL_PAID_REGION_IDS = sorted(r.id for r in ALL_PAID_REGIONS)
 REGION_IDS = sorted(REGIONS_CHOICES_ID_DICT.keys()[1:])
