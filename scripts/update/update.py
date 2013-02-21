@@ -89,6 +89,7 @@ def update_info(ctx, ref='origin/master'):
         ctx.local("git log -1")
         ctx.local("/bin/bash -c 'source /etc/bash_completion.d/git && __git_ps1'")
         ctx.local('git show -s {0} --pretty="format:%h" > media/git-rev.txt'.format(ref))
+        ctx.local('node scripts/update/devbot.js')  # Tell everyone that we're done.
 
 
 @task
