@@ -1,6 +1,8 @@
 $(document).ready(function() {
     // Edit Add-on
-    $("#edit-addon").exists(initEditAddon);
+    if (document.getElementById('edit-addon')) {
+        initEditAddon();
+    }
 
     // Save manifest if passed in
     var params = z.getVars();
@@ -9,39 +11,47 @@ $(document).ready(function() {
     }
 
     //Ownership
-    $("#author_list").exists(function() {
+    if (document.getElementById('author_list')) {
         initAuthorFields();
         initLicenseFields();
-    });
+    }
 
     //Payments
-    $('.payments').exists(initPayments);
+    if ($('.payments').length) {
+        initPayments();
+    }
 
     // Submission process
-    $('.addon-submission-process').exists(function(){
+    if ($('.addon-submission-process').length) {
         initLicenseFields();
         initCharCount();
         initSubmit();
-    });
+    }
 
     // Validate addon (standalone)
-    $('.validate-addon').exists(initSubmit);
+    if ($('.validate-addon').length) {
+        initSubmit();
+    }
 
     // Submission > Describe
-    $("#submit-describe").exists(initCatFields);
+    if (document.getElementById('submit-describe')) {
+        initCatFields();
+    }
 
     // Submission > Descript > Summary
-    $('.addon-submission-process #submit-describe').exists(initTruncateSummary);
+    if ($('.addon-submission-process #submit-describe').length) {
+        initTruncateSummary();
+    }
 
     // Submission > Media
-    $('#submit-media').exists(function() {
+    if (document.getElementById('submit-media')) {
         initUploadIcon();
         initUploadImages();
         initUploadPreview();
-    });
+    }
 
     // Add-on uploader
-    if($('#upload-app').length) {
+    if(document.getElementById('upload-app').length) {
         var opt = {'cancel': $('.upload-file-cancel') };
         $('#upload-app').packagedAppUploader(opt);
     }
@@ -51,7 +61,7 @@ $(document).ready(function() {
         $validate_button = $('#validate_app'),
         $submit_footer = $('#upload-webapp').find('footer');
 
-    if ($webapp_url.exists()) {
+    if ($webapp_url.length) {
         if (!$webapp_url.val()) {
             if (z.capabilities.sessionStorage) {
                 $webapp_url.val(window.sessionStorage['manifest_url']);
@@ -232,7 +242,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#version-list').exists(function() {
+    if (document.getElementById('version-list')) {
         var status = $('#version-status').data('status');
         var versions = $('#modal-delete-version').data('versions');
         $('#modal-delete-version').modal('.delete-version', {
@@ -254,7 +264,7 @@ $(document).ready(function() {
                 }
             }
         });
-    });
+    }
 
     // In-app payments config.
     if ($('#in-app-config').length) {

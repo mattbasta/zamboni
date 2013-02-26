@@ -32,12 +32,6 @@ function wait(ms) {
 
 
 _.extend(String.prototype, {
-    startsWith: function(str) {
-        return this.slice(0, str.length) == str;
-    },
-    endsWith: function(str) {
-        return this.slice(-str.length) == str;
-    },
     trim: function(str) {
         // Trim leading and trailing whitespace (like lstrip + rstrip).
         return this.replace(/^\s*/, '').replace(/\s*$/, '');
@@ -47,30 +41,6 @@ _.extend(String.prototype, {
         return this.replace(/\s/g, '');
     }
 });
-
-
-// Sample usage:
-// ['/en-US/apps/', '/ja/search/', '/fr/contact/'].startsWith('/en-US/')
-Array.prototype.startsWith = function(str) {
-    for (var i = 0; i < this.length; i++) {
-        if (str.startsWith(this[i])) {
-            return true;
-        }
-    }
-    return false;
-};
-
-
-// .exists()
-// This returns true if length > 0.
-$.fn.exists = function(callback, args) {
-    var $this = $(this),
-        len = $this.length;
-    if (len && callback) {
-        callback.apply(null, args);
-    }
-    return !!len;
-};
 
 function makeOrGetOverlay(opts) {
     var classes = 'overlay',
