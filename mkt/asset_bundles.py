@@ -169,35 +169,29 @@ JS = {
 
         'js/lib/jquery-1.9.1.js',
         'js/lib/underscore.js',
+        'js/lib/format.js',
+        'js/lib/jquery.cookie.js',
+        'js/lib/stick.js',
+
         'js/mkt/gettext.js',
-        'js/zamboni/browser.js',
-        'js/amo2009/addons.js',
         'js/mkt/tracking.js',
         'js/devreg/init.js',  # This one excludes buttons initialization, etc.
         'js/devreg/tooltip.js',
+        'js/devreg/popup.js',
         'js/mkt/modal.js',
         'js/mkt/capabilities.js',
-        'js/lib/format.js',
-        'js/lib/jquery.cookie.js',
-        'js/zamboni/storage.js',
-        'js/zamboni/tabs.js',
         'js/common/keys.js',
         'js/impala/serializers.js',
         'js/mkt/utils.js',
         'js/mkt/login.js',
         'js/mkt/notification.js',
 
-        'js/lib/truncate.js',
-        'js/zamboni/truncation.js',
-        'js/zamboni/helpers.js',
-        'js/zamboni/l10n.js',
-        'js/zamboni/debouncer.js',
+        'js/mkt/csrf.js',
+        'js/devreg/l10n.js',
 
         # jQuery UI
         'js/lib/jquery-ui/jquery-ui-1.10.1.custom.js',
-
-        # Users.
-        'js/zamboni/users.js',
+        'js/lib/jquery.minicolors.js',
 
         # Forms.
         'js/impala/forms.js',
@@ -206,10 +200,7 @@ JS = {
         'js/impala/login.js',
 
         # Fix-up outgoing links.
-        'js/zamboni/outgoing_links.js',
-
-        # Stick.
-        'js/lib/stick.js',
+        'js/mkt/outgoing_links.js',
 
         # Developer Hub-specific scripts.
         'js/common/upload-base.js',
@@ -222,10 +213,9 @@ JS = {
         'js/devreg/tabs.js',
         'js/devreg/edit.js',
         'js/impala/persona_creation.js',
-        'js/lib/jquery.minicolors.js',
 
         # Specific stuff for making payments nicer.
-        'js/zamboni/validator.js',
+        'js/devreg/validator.js',
         'js/mkt/overlay.js',
         'js/devreg/payments-enroll.js',
         'js/devreg/payments-manage.js',

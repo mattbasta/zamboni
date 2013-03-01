@@ -1009,8 +1009,6 @@ function initAuthorFields() {
         var numForms = author_list.children(".author").length;
         author_list.append(empty_form([numForms]))
                    .sortable("refresh");
-        author_list.find(".blank .email-autocomplete")
-                   .placeholder();
         manager.val(author_list.children(".author").length);
         renumberAuthors();
     }
