@@ -54,9 +54,7 @@ $.fn.popup = function(click_target, o) {
             os  = pm ? $popup.outerWidth(false) - 84 : 63,
             toX = pos.left + (offset.x || tw) - os,
             toY = pos.top + (offset.y || th) + 4;
-        $popup.removeClass("left");
-        if (pm)
-            $popup.addClass("left");
+        $popup.toggleClass("left", pm);
         $popup.css({
             'left': toX,
             'top': toY,
