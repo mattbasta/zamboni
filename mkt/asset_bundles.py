@@ -172,6 +172,7 @@ JS = {
         'js/lib/format.js',
         'js/lib/jquery.cookie.js',
         'js/lib/stick.js',
+        'js/lib/csrf.js',
 
         'js/mkt/gettext.js',
         'js/mkt/tracking.js',
@@ -182,25 +183,16 @@ JS = {
         'js/mkt/capabilities.js',
         'js/common/keys.js',
         'js/impala/serializers.js',
-        'js/mkt/utils.js',
         'js/mkt/login.js',
         'js/mkt/notification.js',
+        'js/mkt/outgoing_links.js',
+        'js/mkt/utils.js',
 
-        'js/mkt/csrf.js',
         'js/devreg/l10n.js',
 
         # jQuery UI
         'js/lib/jquery-ui/jquery-ui-1.10.1.custom.js',
         'js/lib/jquery.minicolors.js',
-
-        # Forms.
-        'js/impala/forms.js',
-
-        # Login.
-        'js/impala/login.js',
-
-        # Fix-up outgoing links.
-        'js/mkt/outgoing_links.js',
 
         # Developer Hub-specific scripts.
         'js/common/upload-base.js',

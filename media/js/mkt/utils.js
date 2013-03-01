@@ -12,6 +12,16 @@ function fieldFocused(e) {
 }
 
 
+function postUnsaved(data) {
+    $('input[name="unsaved_data"]').val(JSON.stringify(data));
+}
+
+
+function loadUnsaved() {
+    return JSON.parse($('input[name="unsaved_data"]').val() || '{}');
+}
+
+
 var escape_ = function(s) {
     if (s === undefined) {
         return;

@@ -51,7 +51,7 @@ $(document).ready(function() {
     }
 
     // Add-on uploader
-    if(document.getElementById('upload-app').length) {
+    if(document.getElementById('upload-app')) {
         var opt = {'cancel': $('.upload-file-cancel') };
         $('#upload-app').packagedAppUploader(opt);
     }
