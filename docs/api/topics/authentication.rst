@@ -38,6 +38,9 @@ stored as a cookie.
         sent with authorized requests as a query string parameter named
         ``_user``.
     :param settings: user account settings.
+    :param permissions: permissions and properties for the user account. It
+        contains boolean values which describe whether the user has the
+        permission described by the key of the field.
 
     Example:
 
@@ -50,6 +53,13 @@ stored as a cookie.
                 "display_name": "fred foobar",
                 "email": "ffoob@example.com",
                 "region": "appistan"
+            },
+            "permissions": {
+                "reviewer": false,
+                "admin": false,
+                "localizer": false,
+                "lookup": true,
+                "developer": true
             }
         }
 

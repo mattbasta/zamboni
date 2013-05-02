@@ -154,6 +154,11 @@ class TestLoginHandler(TestCase):
             'cvan@mozilla.com,95c9063d9f249aacfe5697fc83192ed6480c01463e2a80b3'
             '5af5ecaef11754700f4be33818d0e83a0cfc2cab365d60ba53b3c2b9f8f6589d1'
             'c43e9bbb876eef0,000000')
+        assert 'permissions' in res.content
+        assert all(x in res.content['permissions'] for x in
+                   ['reviewer', 'admin', 'localizer', 'lookup', 'developer'])
+        assert all(isinstance(x, bool) for x in
+                   res.content['permissions'].values())
 
     @patch('requests.post')
     def test_login_failure(self, http_request):

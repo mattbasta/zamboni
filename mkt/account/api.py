@@ -10,6 +10,7 @@ from tastypie.authorization import Authorization
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.throttle import CacheThrottle
 
+from access import acl
 from amo.utils import send_mail_jinja
 from mkt.api.authentication import (OAuthAuthentication,
                                     OptionalOAuthAuthentication,
@@ -104,6 +105,15 @@ class LoginResource(CORSResource, MarketplaceResource):
                     'display_name': (UserProfile.objects
                                      .get(user=request.user).display_name),
                     'email': request.user.email,
+                },
+                'permissions': {
+                    'reviewer': acl.check_reviewer(request),
+                    'admin': acl.action_allowed(request, 'Admin', '%'),
+                    'localizer': acl.action_allowed(
+                        request, 'Localizers', '%'),
+                    'lookup': acl.action_allowed(
+                        request, 'AccountLookup', '%'),
+                    'developer': request.amo_user.is_app_developer,
                 }
             })
         return res
